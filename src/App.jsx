@@ -7,9 +7,9 @@ function App() {
   const { isAuthenticated, isLoading, getToken } = useKindeAuth();
 
   if (isLoading) return <>Loading...</>;
-  if (!isAuthenticated) return <SignInUp />;
+  if (isAuthenticated) return <Dashboard />;
   if (isAuthenticated) console.log(getToken());
-  return <Dashboard />;
+  return <SignInUp />;
 }
 
 export default App;

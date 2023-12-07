@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     logoutUri="http://localhost:5173/"
     redirectUri="http://localhost:5173/"
     audience="https://thebox3d.com"
-    onRedirectCallback={onRedirectCallback} // Add this line
+    onRedirectCallback={onRedirectCallback} 
   >
     <App />
   </KindeProvider>
