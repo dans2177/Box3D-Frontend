@@ -5,17 +5,18 @@ const SignInUp = () => {
   const { login, register } = useKindeAuth();
 
   return (
-    <div className="flex flex-col md:flex-row h-screen">
-      <div className="flex-1 md:flex-initial md:w-1/3 bg-blue-500 p-4">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-800 text-gray-200">
+      <div className="flex-1 md:flex-initial md:w-1/3 flex flex-col justify-center items-center p-4">
+        <h1 className="text-4xl font-bold mb-8">Welcome to 3D Logbook</h1>
         <button
-          className="bg-green-500 text-white font-bold py-2 px-4 rounded mb-4"
+          className="bg-green-600 text-white font-bold py-3 px-6 rounded mb-4 hover:bg-green-700 transition-colors"
           onClick={register}
           type="button"
         >
-          Sign up
+          Start Tracking
         </button>
         <button
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-600 text-white font-bold py-3 px-6 rounded hover:bg-blue-700 transition-colors"
           onClick={login}
           type="button"
         >
@@ -23,11 +24,11 @@ const SignInUp = () => {
         </button>
       </div>
 
-      <div className="hidden md:block md:w-2/3">
+      <div className="hidden md:flex md:w-2/3 items-center justify-center">
         <img
           src={IntroBanner}
-          alt="Sign In Image"
-          className="object-cover h-full w-full"
+          alt="Sign In Banner"
+          className="object-cover h-3/4 w-3/4 rounded-lg shadow-xl"
         />
       </div>
     </div>
@@ -35,4 +36,3 @@ const SignInUp = () => {
 };
 
 export default SignInUp;
-

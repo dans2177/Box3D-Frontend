@@ -4,7 +4,6 @@ import FilamentForm from "./FilamentForm";
 const FilamentDashboard = () => {
   return (
     <div>
-      <h2>Filament Data</h2>
       <FilamentComponent />
       <FilamentForm />
     </div>

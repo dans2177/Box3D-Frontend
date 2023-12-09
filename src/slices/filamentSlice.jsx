@@ -9,9 +9,7 @@ export const fetchFilaments = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       },
     });
-    const data = await response.json();
-
-    return data;
+    return response.json(); // Correct usage
   }
 );
 
@@ -27,7 +25,7 @@ export const addFilament = createAsyncThunk(
       body: JSON.stringify(filamentData),
     });
 
-    const data = await response.JSON();
+    const data = await response.json();
     return data;
   }
 );
@@ -46,16 +44,16 @@ const filamentSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchFilaments.fulfilled, (state, action) => {
+        console.log("fetchFilaments payload:", action.payload); // Debug log
         state.status = "succeeded";
-        // Add any fetched filaments to the array
-        state.items = action.payload.data;
+        state.items = action.payload;
       })
       .addCase(fetchFilaments.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       })
       .addCase(addFilament.fulfilled, (state, action) => {
-        // Handle the successful addition of a filament
+        // Add the new filament to the state
         state.items.push(action.payload);
       })
       .addCase(addFilament.rejected, (state, action) => {
