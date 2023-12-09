@@ -1,116 +1,125 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addFilament } from "../slices/filamentSlice.jsx";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
-const FilamentDashboard = () => {
-  const { getToken } = useKindeAuth(); // Assuming you have useKindeAuth hook for authentication
-
-  const [formData, setFormData] = useState({
+const FilamentForm = () => {
+  const [filament, setFilament] = useState({
     name: "",
     color: "",
     manufacturer: "",
     material: "",
     startingAmount: 0,
-    // Add other fields as necessary
+    notes: "",
+    size: "",
+    temperature: "",
+    isArchived: false,
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  // Reusable change handler for form inputs
+  const { getToken } = useKindeAuth();
+  const dispatch = useDispatch();
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+    const { name, value, type, checked } = e.target;
+    setFilament({
+      ...filament,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
-  // Form submit handler
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setError(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = await getToken();
+    console.log(token); // Optional: For debugging purposes
 
-    try {
-      const accessToken = await getToken();
-      const response = await fetch("http://localhost:3000/filament-data/add", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    dispatch(addFilament({ filamentData: filament, token }));
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      // Handle response here, maybe update state or redirect user
-      setIsLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setIsLoading(false);
-      console.error("Error submitting form:", err);
-    }
+    // Reset form data
+    setFilament({
+      name: "",
+      color: "",
+      manufacturer: "",
+      material: "",
+      startingAmount: 0,
+      notes: "",
+      size: "",
+      temperature: "",
+      isArchived: false,
+    });
   };
 
-  // Form rendering
   return (
-    <div>
-      <h2>Add Filament</h2>
-      {isLoading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Color:</label>
-          <input
-            type="text"
-            name="color"
-            value={formData.color}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Manufacturer:</label>
-          <input
-            type="text"
-            name="manufacturer"
-            value={formData.manufacturer}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Material:</label>
-          <input
-            type="text"
-            name="material"
-            value={formData.material}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Starting Amount:</label>
-          <input
-            type="number"
-            name="startingAmount"
-            value={formData.startingAmount}
-            onChange={handleChange}
-          />
-        </div>
-        {/* Add more input fields as needed */}
-        <button type="submit">Add Filament</button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        name="name"
+        value={filament.name}
+        onChange={handleChange}
+        placeholder="Name"
+        required
+      />
+      <input
+        type="text"
+        name="color"
+        value={filament.color}
+        onChange={handleChange}
+        placeholder="Color"
+      />
+      <input
+        type="text"
+        name="manufacturer"
+        value={filament.manufacturer}
+        onChange={handleChange}
+        placeholder="Manufacturer"
+      />
+      <input
+        type="text"
+        name="material"
+        value={filament.material}
+        onChange={handleChange}
+        placeholder="Material"
+      />
+      <input
+        type="number"
+        name="startingAmount"
+        value={filament.startingAmount}
+        onChange={handleChange}
+        placeholder="Starting Amount"
+        required
+        min="0"
+      />
+      <textarea
+        name="notes"
+        value={filament.notes}
+        onChange={handleChange}
+        placeholder="Notes"
+      />
+      <input
+        type="text"
+        name="size"
+        value={filament.size}
+        onChange={handleChange}
+        placeholder="Size"
+      />
+      <input
+        type="text"
+        name="temperature"
+        value={filament.temperature}
+        onChange={handleChange}
+        placeholder="Temperature"
+      />
+      <label>
+        Is Archived:
+        <input
+          type="checkbox"
+          name="isArchived"
+          checked={filament.isArchived}
+          onChange={handleChange}
+        />
+      </label>
+      <button type="submit">Add Filament</button>
+    </form>
   );
 };
 
-export default FilamentDashboard;
+export default FilamentForm;
