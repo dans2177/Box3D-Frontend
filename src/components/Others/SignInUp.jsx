@@ -1,5 +1,5 @@
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import IntroBanner from "../assets/IntroBanner.png";
+import IntroBanner from "../../assets/IntroBanner.png";
 
 const SignInUp = () => {
   const { login, register } = useKindeAuth();

@@ -1,13 +1,13 @@
-import { useState } from "react";
-import DashboardLogo from "../assets/DashboardLogo.gif";
-import projectsImage from "../assets/Projects.png"; // Import your projects image
-import filamentsImage from "../assets/Filament.png"; // Import your filaments image
+import DashboardLogo from "../../assets/DashboardLogo.gif";
+import projectsImage from "../../assets/Projects.png"; // Import your projects image
+import filamentsImage from "../../assets/Filament.png"; // Import your filaments image
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const [activeComponent, setActiveComponent] = useState("");
+  const navigate = useNavigate();
 
-  const handleTileClick = (componentName) => {
-    setActiveComponent(componentName);
+  const handleTileClick = () => {
+    navigate("/filaments");
   };
 
   return (
@@ -21,10 +21,7 @@ const Dashboard = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-6xl mx-auto">
         {/* Projects Tile */}
-        <div
-          className="flex flex-col justify-start items-center bg-gray-200 p-4 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
-          onClick={() => handleTileClick("projects")}
-        >
+        <div className="flex flex-col justify-start items-center bg-gray-200 p-4 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer">
           <div className="w-full  overflow-hidden rounded-t-lg">
             <img
               src={projectsImage}
@@ -36,15 +33,14 @@ const Dashboard = () => {
         </div>
 
         {/* Filaments Tile */}
-        <div
-          className="flex flex-col justify-start items-center bg-gray-200 p-4 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
-          onClick={() => handleTileClick("filaments")}
-        >
+        <div className="flex flex-col justify-start items-center bg-gray-200 p-4 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer">
           <div className="w-full overflow-hidden rounded-t-lg">
             <img
               src={filamentsImage}
               alt="Filaments"
               className="w-full h-full object-cover aspect-square"
+            //Redirect to FilamentComponent
+            onClick={handleTileClick}
             />
           </div>
           <h2 className="text-2xl mt-4 mb-2 text-center font-sans">
@@ -52,8 +48,6 @@ const Dashboard = () => {
           </h2>
         </div>
       </div>
-      {activeComponent === "projects" && <div>Projects Logbook</div>}
-      {activeComponent === "filaments" && <div>Filament</div>}
     </div>
   );
 };

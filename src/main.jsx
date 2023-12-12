@@ -4,7 +4,9 @@ import "./index.css";
 import { KindeProvider } from "@kinde-oss/kinde-auth-react";
 import { store } from "./Store.jsx"; // Adjust the import path as necessary
 import { Provider } from "react-redux";
+import Modal from "react-modal"; // Import Modal from react-modal
 
+Modal.setAppElement("#root"); // Set the app element to the root element of your application
 const onRedirectCallback = (user, app_state) => {
   console.log({ user, app_state });
 };
