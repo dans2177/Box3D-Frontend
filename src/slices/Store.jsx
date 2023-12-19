@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import filamentReducer from "./slices/filamentSlice.jsx";
+import filamentReducer from "./filamentSlice.jsx";
 
 export const store = configureStore({
   reducer: {

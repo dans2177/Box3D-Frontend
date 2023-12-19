@@ -2,9 +2,11 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { KindeProvider } from "@kinde-oss/kinde-auth-react";
-import { store } from "./Store.jsx"; // Adjust the import path as necessary
+import { store } from "./slices/Store.jsx"; // Adjust the import path as necessary
 import { Provider } from "react-redux";
 import Modal from "react-modal"; // Import Modal from react-modal
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify styles
 
 Modal.setAppElement("#root"); // Set the app element to the root element of your application
 const onRedirectCallback = (user, app_state) => {
@@ -21,6 +23,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     onRedirectCallback={onRedirectCallback}
   >
     <Provider store={store}>
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
+
       <App />
     </Provider>
   </KindeProvider>

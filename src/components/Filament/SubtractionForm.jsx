@@ -1,44 +1,79 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { createSubtraction } from "../redux/filamentSlice";
+import { createSubtraction } from "../../slices/filamentSlice";
+import Modal from "react-modal";
+import PropTypes from "prop-types";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
+import { useParams } from "react-router-dom";
 
-const SubtractionForm = ({ filamentId }) => {
-  const [subtractionData, setSubtractionData] = useState({
-    subtractionLength: "",
-    project: "",
-    date: "",
-  });
-
+const SubtractionForm = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
+  const [subtractionAmount, setSubtractionAmount] = useState("");
+  const { getToken } = useKindeAuth();
+  const [token, setToken] = useState(null);
+  const { filamentId } = useParams(); // Extract filamentId from the URL using useParams
 
-  const handleChange = (e) => {
-    setSubtractionData({ ...subtractionData, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const fetchedToken = await getToken();
+        setToken(fetchedToken);
+      } catch (error) {
+        console.error("Error fetching token:", error);
+      }
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(createSubtraction({ filamentId, subtractionData }));
+    fetchToken();
+  }, [getToken]);
+
+  const handleSubtraction = async () => {
+  ``
+    const subtractionData = {
+      filamentId: filamentId, // Use the extracted filamentId
+      subtractionLength: Number(subtractionAmount),
+      project: null,
+    };
+    console.log(subtractionData);
+
+    dispatch(
+      createSubtraction({
+        filamentId: filamentId, // Use the extracted filamentId
+        subtractionData,
+        token: token,
+      })
+    );
+    console.log("Subtraction created");
+    setSubtractionAmount("");
+    onClose();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+    >
+      <h3 className="text-lg font-semibold">Subtract Filament</h3>
       <input
         type="number"
-        name="subtractionLength"
-        value={subtractionData.subtractionLength}
-        onChange={handleChange}
-        placeholder="Subtraction Length"
-        className="w-full p-2 border border-gray-300 rounded"
+        value={subtractionAmount}
+        onChange={(e) => setSubtractionAmount(e.target.value)}
+        placeholder="Enter subtraction amount"
+        className="border border-gray-300 rounded-md px-2 py-1 mt-2 w-full"
       />
-      {/* Add other input fields similarly */}
       <button
-        type="submit"
-        className="px-4 py-2 bg-green-500 text-white rounded"
+        onClick={handleSubtraction}
+        className="bg-blue-500 hover-bg-blue-600 text-white rounded-md px-4 py-2 mt-2"
       >
-        Add Subtraction
+        Confirm
       </button>
-    </form>
+    </Modal>
   );
+};
+
+SubtractionForm.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default SubtractionForm;

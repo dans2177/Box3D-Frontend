@@ -1,63 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchFilaments } from "../../slices/filamentSlice.jsx";
+import { fetchFilaments } from "../../slices/filamentSlice";
+import FilamentCard from "./FilamentCard";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import Loading from "../../components/Others/Loading.jsx";
-import FilamentForm from "../../components/Filament/FilamentForm.jsx";
-import Modal from "react-modal";
+import FilamentForm from "./FilamentForm";
+import { IoIosArrowBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 
 const InventoryView = () => {
   const dispatch = useDispatch();
-  const filaments = useSelector((state) => state.filament.items);
+  const filamentState = useSelector((state) => state.filament);
   const { getToken } = useKindeAuth();
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const navigate = useNavigate(); // Use useNavigate for navigation
 
   useEffect(() => {
     const fetchTokenAndDispatch = async () => {
-      const token = await getToken();
-      dispatch(fetchFilaments(token));
+      try {
+        const token = await getToken();
+        dispatch(fetchFilaments(token));
+      } catch (error) {
+        console.error("Error fetching token:", error);
+      }
     };
 
     fetchTokenAndDispatch();
   }, [dispatch, getToken]);
 
-  if (filaments.status === "loading") {
-    return <Loading />;
+  const handleBackClick = () => {
+    // Use navigate function for navigation
+    navigate(-1); // Go back one step in history
+  };
+
+  if (filamentState.status === "loading") {
+    return <div>Loading...</div>;
   }
+
+  if (filamentState.error) {
+    return <div>Error: {filamentState.error}</div>;
+  }
+
+  const filamentData = filamentState.items;
 
   return (
     <div className="p-4">
-      <h2 className="text-lg font-bold mb-4">Filament Inventory</h2>
-      <div className="space-y-2">
-        {filaments.data && Array.isArray(filaments.data) ? (
-          filaments.data.map((filament) => (
-            <div key={filament._id} className="border p-2">
-              <h3 className="font-semibold">{filament.name}</h3>
-            </div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center">
+          <IoIosArrowBack size={24} className="mr-2" onClick={handleBackClick} />
+          <h2 className="text-2xl font-semibold">Filament Inventory</h2>
+        </div>
+        <FilamentForm />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+        {/* Use grid classes to create a responsive grid layout */}
+        {/* One card per column on small screens, 4 columns on larger screens */}
+        {filamentData && Array.isArray(filamentData) ? (
+          filamentData.map((filament) => (
+            <FilamentCard key={filament._id} filament={filament} />
           ))
         ) : (
           <p>No filaments data available.</p>
         )}
       </div>
-
-      <button
-        onClick={() => setModalIsOpen(true)}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Open Filament Form
-      </button>
-
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
-        className="modal" // Add your modal styles here
-        overlayClassName="modal-overlay" // Add your overlay styles here
-      >
-        <FilamentForm
-          initialData={null}
-          onSubmit={() => setModalIsOpen(false)}
-        />
-      </Modal>
     </div>
   );
 };
