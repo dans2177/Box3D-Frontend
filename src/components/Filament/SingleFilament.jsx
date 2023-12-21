@@ -5,18 +5,14 @@ import { getSingleFilament, updateFilament } from "../../slices/filamentSlice";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { toast } from "react-toastify";
 import { FaArrowLeft, FaCut } from "react-icons/fa"; // Import arrow icon for the back button
-import SubtractionForm from "./SubtractionForm"; // Adjust the path as necessary
 import LoadingComponent from "../Others/Loading";
+import SubtractFilament from "./SubtractFilament";
+
 
 const SingleFilament = () => {
   const { filamentId } = useParams();
   const dispatch = useDispatch();
   const { getToken } = useKindeAuth();
-  const [isSubtractionFormOpen, setIsSubtractionFormOpen] = useState(false);
-
-  const toggleSubtractionForm = () => {
-    setIsSubtractionFormOpen(!isSubtractionFormOpen);
-  };
   const loading = useSelector((state) => state.filament.status === "loading");
 
   useEffect(() => {
@@ -147,14 +143,10 @@ const SingleFilament = () => {
         </div>
 
         <div>
+          <SubtractFilament />
+
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-xl font-bold">Subtractions</h3>
-            <button
-              onClick={toggleSubtractionForm}
-              className="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-4 py-2"
-            >
-              {isSubtractionFormOpen ? "Close Form" : "Add Subtraction"}
-            </button>
           </div>
           {filament.subtractions.map((subtraction) => (
             <div
@@ -181,11 +173,6 @@ const SingleFilament = () => {
           ))}
         </div>
       </div>
-      <SubtractionForm
-        isOpen={isSubtractionFormOpen}
-        onClose={toggleSubtractionForm}
-        filamentId={filamentId}
-      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchFilaments } from "../../slices/filamentSlice";
 import FilamentCard from "./FilamentCard";
@@ -45,7 +45,11 @@ const InventoryView = () => {
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
-          <IoIosArrowBack size={24} className="mr-2" onClick={handleBackClick} />
+          <IoIosArrowBack
+            size={24}
+            className="mr-2 hover:cursor-pointer"
+            onClick={handleBackClick}
+          />
           <h2 className="text-2xl font-semibold">Filament Inventory</h2>
         </div>
         <FilamentForm />

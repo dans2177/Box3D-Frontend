@@ -1,7 +1,7 @@
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import IntroBanner from "../../assets/IntroBanner.png";
 
-const SignInUp = () => {
+const AuthenticationForm = () => {
   const { login, register } = useKindeAuth();
 
   return (
@@ -35,4 +35,4 @@ const SignInUp = () => {
   );
 };
 
-export default SignInUp;
+export default AuthenticationForm;

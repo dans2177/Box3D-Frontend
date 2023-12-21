@@ -1,4 +1,4 @@
-import SignInUp from "./components/Others/SignInUp.jsx";
+import AuthenticationForm from "./components/Others/AuthenticationForm.jsx";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import Dashboard from "./components/Others/Dashboard.jsx";
 import LoadingComponent from "./components/Others/Loading.jsx";
@@ -11,7 +11,7 @@ function App() {
   const { isAuthenticated, isLoading, getToken } = useKindeAuth();
 
   if (isLoading) return <LoadingComponent />;
-  if (!isAuthenticated) return <SignInUp />;
+  if (!isAuthenticated) return <AuthenticationForm />;
   if (isAuthenticated) console.log(getToken());
   return (
     <Router>

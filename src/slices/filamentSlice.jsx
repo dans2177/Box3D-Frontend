@@ -91,37 +91,28 @@ export const getSingleFilament = createAsyncThunk(
 export const createSubtraction = createAsyncThunk(
   "filament/createSubtraction",
   async ({ filamentId, subtractionAmount, token }) => {
-    // Use subtractionAmount instead of subtractionLength
-    try {
-      const subtractionData = {
-        filamentId: filamentId,
-        subtractionLength: Number(subtractionAmount), // Ensure it's a valid number
-        // You may include other properties like project if needed
-      };
+    const subtractionData = {
+      subtractionLength: Number(subtractionAmount),
+    };
 
-      const response = await fetch(
-        `http://localhost:3000/filament-data/${filamentId}/subtraction`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(subtractionData), // Send the data as JSON
-        }
-      );
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Unable to create subtraction");
+    const response = await fetch(
+      `http://localhost:3000/filament-data/${filamentId}/subtraction`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(subtractionData),
       }
+    );
 
-      // Update the state with the newly added subtraction and updated filament data
-      return data;
-    } catch (error) {
-      console.error("Error creating subtraction:", error);
-      throw error;
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Unable to create subtraction");
     }
+
+    return { filamentId, newSubtraction: data.newSubtraction };
   }
 );
 
@@ -205,7 +196,6 @@ const filamentSlice = createSlice({
         // Make sure the _id is set in the payload
         state.items[state.items.length - 1]._id = action.payload._id;
       })
-
       .addCase(addFilament.rejected, (state, action) => {
         state.error = action.error.message;
       })
@@ -238,22 +228,19 @@ const filamentSlice = createSlice({
         }
       })
       .addCase(createSubtraction.fulfilled, (state, action) => {
-        const { filamentId, subtractionData } = action.meta.arg;
+        const { filamentId, newSubtraction } = action.payload;
         const index = state.items.findIndex((f) => f._id === filamentId);
 
         if (index !== -1) {
-          const filament = state.items[index];
-          filament.subtractions.push(subtractionData);
+          state.items[index].subtractions.push(newSubtraction);
 
-          // Calculate the new currentAmount
-          const newCurrentAmount =
-            filament.startingAmount -
-            filament.subtractions.reduce(
-              (total, sub) => total + sub.subtractionLength,
-              0
-            );
-
-          filament.currentAmount = newCurrentAmount;
+          // Recalculate the currentAmount
+          const totalSubtractedLength = state.items[index].subtractions.reduce(
+            (total, subtraction) => total + subtraction.subtractionLength,
+            0
+          );
+          state.items[index].currentAmount =
+            state.items[index].startingAmount - totalSubtractedLength;
         }
       })
       .addCase(getSubtractions.fulfilled, (state, action) => {

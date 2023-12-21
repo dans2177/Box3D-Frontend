@@ -1,11 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import SubtractionForm from "./SubtractionForm";
 
 const FilamentCard = ({ filament }) => {
-  const [isSubtractionFormOpen, setIsSubtractionFormOpen] = useState(false);
-
   FilamentCard.propTypes = {
     filament: PropTypes.shape({
       _id: PropTypes.string.isRequired,
@@ -22,14 +18,6 @@ const FilamentCard = ({ filament }) => {
   const remainingPercentage = hasSubtractions
     ? (filament.currentAmount / filament.startingAmount) * 100
     : 100;
-
-  const openSubtractionForm = () => {
-    setIsSubtractionFormOpen(true);
-  };
-
-  const closeSubtractionForm = () => {
-    setIsSubtractionFormOpen(false);
-  };
 
   return (
     <div className="bg-gray-100 rounded-lg p-4 mb-4 shadow-md relative">
@@ -60,24 +48,15 @@ const FilamentCard = ({ filament }) => {
       ) : (
         <p>No subtractions made yet.</p>
       )}
-      <button
-        onClick={openSubtractionForm}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
-      >
-        Subtract
-      </button>
-      {/* Change Delete button to View button */}
-      <Link
-        to={`/filament/${filament._id}`}
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
-      >
-        View
-      </Link>
-      <SubtractionForm
-        isOpen={isSubtractionFormOpen}
-        onClose={closeSubtractionForm}
-        filamentId={filament._id}
-      />
+
+      <div className="mt-4">
+        <Link
+          to={`/filament/${filament._id}`}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded p-4"
+        >
+          View
+        </Link>
+      </div>
     </div>
   );
 };
