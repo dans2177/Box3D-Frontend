@@ -32,25 +32,38 @@ export const updateFilament = createAsyncThunk(
   }
 );
 
-// Add Filament
+// Modify addFilament action creator
 export const addFilament = createAsyncThunk(
   "filament/addFilament",
-  async ({ filamentData, token }) => {
-    const response = await fetch("http://localhost:3000/filament-data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(filamentData),
-    });
+  async ({ filamentData, token }, { dispatch }) => {
+    try {
+      const response = await fetch("http://localhost:3000/filament-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(filamentData),
+      });
+      console.log(response);
 
-    const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Error adding filament");
+      }
 
-    // Ensure the _id is set in the payload
-    data._id = data._id || ""; // Set it to an empty string if it's undefined
+      const responseData = await response.json();
+      console.log(responseData); // Debug log
 
-    return data;
+      if (responseData.filament && responseData.filament._id) {
+        dispatch(fetchFilaments(token)); // Dispatch a "filament refresh" action to update the state
+        return responseData.filament;
+      } else {
+        throw new Error("Invalid response from the backend");
+      }
+    } catch (error) {
+      console.error("Error adding filament:", error);
+      throw error; // Re-throw the error to handle it in your component
+    }
   }
 );
 
@@ -74,7 +87,15 @@ export const deleteFilament = createAsyncThunk(
 // Get Single Filament
 export const getSingleFilament = createAsyncThunk(
   "filament/getSingleFilament",
-  async ({ filamentId, token }) => {
+  async ({ filamentId, token }, { getState }) => {
+    const state = getState();
+    const existingFilament = state.filament.items.find(
+      (f) => f._id === filamentId
+    );
+    if (existingFilament) {
+      return existingFilament;
+    }
+
     const response = await fetch(
       `http://localhost:3000/filament-data/${filamentId}`,
       {
@@ -83,6 +104,11 @@ export const getSingleFilament = createAsyncThunk(
         },
       }
     );
+
+    if (!response.ok) {
+      throw new Error("Error fetching single filament");
+    }
+
     return response.json();
   }
 );
@@ -190,11 +216,12 @@ const filamentSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+      .addCase(addFilament.pending, (state) => {
+        state.status = "loading";
+      })
       .addCase(addFilament.fulfilled, (state, action) => {
-        // Add the new filament to the state
-        state.items.push(action.payload);
-        // Make sure the _id is set in the payload
-        state.items[state.items.length - 1]._id = action.payload._id;
+        state.status = "succeeded";
+        state.items.push(action.payload); // Add the new filament to the state
       })
       .addCase(addFilament.rejected, (state, action) => {
         state.error = action.error.message;
@@ -216,7 +243,6 @@ const filamentSlice = createSlice({
           state.items[index][updatedProperty] = updatedValue;
         }
       })
-
       .addCase(getSingleFilament.fulfilled, (state, action) => {
         const index = state.items.findIndex(
           (f) => f._id === action.payload._id

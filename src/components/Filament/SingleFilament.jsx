@@ -6,7 +6,6 @@ import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { toast } from "react-toastify";
 import { FaArrowLeft, FaCut } from "react-icons/fa"; // Import arrow icon for the back button
 import LoadingComponent from "../Others/Loading";
-import SubtractFilament from "./SubtractFilament";
 
 
 const SingleFilament = () => {
@@ -14,6 +13,19 @@ const SingleFilament = () => {
   const dispatch = useDispatch();
   const { getToken } = useKindeAuth();
   const loading = useSelector((state) => state.filament.status === "loading");
+
+  // Get the filament data directly from the Redux store
+  const filament = useSelector((state) => {
+    return state.filament.items.find((item) => item._id === filamentId);
+  });
+
+  const remainingPercentage = filament
+    ? (filament.currentAmount / filament.startingAmount) * 100
+    : 0;
+  const initialNote = filament?.notes || "";
+  const [editedNote, setEditedNote] = useState(initialNote);
+  const [isArchived, setIsArchived] = useState(filament?.isArchived || false);
+  const [noteEdited, setNoteEdited] = useState(false);
 
   useEffect(() => {
     const fetchTokenAndFilament = async () => {
@@ -28,34 +40,21 @@ const SingleFilament = () => {
     fetchTokenAndFilament();
   }, [dispatch, filamentId, getToken]);
 
-  const filament = useSelector((state) => {
-    return state.filament.items.find((item) => item._id === filamentId);
-  });
-  const remainingPercentage = filament
-    ? (filament.currentAmount / filament.startingAmount) * 100
-    : 0;
-  const initialNote = filament?.notes || "";
-  const [editedNote, setEditedNote] = useState(initialNote);
-  const [isArchived, setIsArchived] = useState(filament?.isArchived || false);
-  const [noteEdited, setNoteEdited] = useState(false);
-
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     if (name === "notes") {
       setEditedNote(value);
-      setNoteEdited(true); // Set the flag to indicate note edit
+      setNoteEdited(true);
     }
   };
   const navigate = useNavigate();
 
   const handleBackClick = () => {
-    // Use navigate function for navigation
-    navigate(-1); // Go back one step in history
+    navigate(-1);
   };
 
   const handleUpdate = async () => {
     if (!noteEdited) {
-      // If the note hasn't been edited, do nothing
       return;
     }
 
@@ -70,7 +69,7 @@ const SingleFilament = () => {
       .unwrap()
       .then(() => {
         toast.success("Update successful!");
-        setNoteEdited(false); // Reset the flag after a successful update
+        setNoteEdited(false);
       })
       .catch((error) => {
         toast.error("Error updating.");
@@ -83,9 +82,8 @@ const SingleFilament = () => {
   }
 
   if (loading) {
-    return <LoadingComponent />; // Or any other loading component
+    return <LoadingComponent />;
   }
-
   // Rest of your component code
 
   return (
@@ -143,7 +141,6 @@ const SingleFilament = () => {
         </div>
 
         <div>
-          <SubtractFilament />
 
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-xl font-bold">Subtractions</h3>

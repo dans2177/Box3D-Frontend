@@ -6,33 +6,36 @@ import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import FilamentForm from "./FilamentForm";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import LoadingComponent from "../Others/Loading";
 
 const InventoryView = () => {
   const dispatch = useDispatch();
   const filamentState = useSelector((state) => state.filament);
   const { getToken } = useKindeAuth();
-  const navigate = useNavigate(); // Use useNavigate for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTokenAndDispatch = async () => {
       try {
         const token = await getToken();
-        dispatch(fetchFilaments(token));
+        if (filamentState.items.length === 0) {
+          // Check if the state is empty
+          await dispatch(fetchFilaments(token)); // Fetch data only if it's empty
+        }
       } catch (error) {
         console.error("Error fetching token:", error);
       }
     };
 
     fetchTokenAndDispatch();
-  }, [dispatch, getToken]);
+  }, [dispatch, getToken, filamentState.items]);
 
   const handleBackClick = () => {
-    // Use navigate function for navigation
-    navigate(-1); // Go back one step in history
+    navigate("/");
   };
 
   if (filamentState.status === "loading") {
-    return <div>Loading...</div>;
+    return <LoadingComponent />;
   }
 
   if (filamentState.error) {
@@ -54,9 +57,7 @@ const InventoryView = () => {
         </div>
         <FilamentForm />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-        {/* Use grid classes to create a responsive grid layout */}
-        {/* One card per column on small screens, 4 columns on larger screens */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 px-4 lg:px-8 xl:px-16 2xl:px-32">
         {filamentData && Array.isArray(filamentData) ? (
           filamentData.map((filament) => (
             <FilamentCard key={filament._id} filament={filament} />
