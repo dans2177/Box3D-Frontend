@@ -1,86 +1,93 @@
+// SubtractionForm.js
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
-import { createSubtraction } from "../../slices/filamentSlice";
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import ReactModal from "react-modal";
+import { createSubtraction } from "../../slices/filamentSlice"; // Adjust the import path as needed
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
+import { GrSubtractCircle } from "react-icons/gr";
+import { toast } from "react-toastify";
 
-SubtractFilamentPopup.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  filamentId: PropTypes.string.isRequired,
-  // Add any other props you are using in the same way
-};
+ReactModal.setAppElement("#root");
 
-const SubtractFilamentPopup = ({ isOpen, onClose, filamentId }) => {
-  const dispatch = useDispatch();
-  const { getToken } = useKindeAuth();
+const SubtractionFilament = ({ filamentId, filamentName }) => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [subtractionAmount, setSubtractionAmount] = useState("");
+  const dispatch = useDispatch();
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
+  const { getToken } = useKindeAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!subtractionAmount) {
-      toast.error("Please enter a valid subtraction amount.");
-      return;
-    }
-
-    try {
-      const token = await getToken();
-      await dispatch(
+  const handleSubtraction = async () => {
+    // Check if subtractionAmount is positive
+    if (subtractionAmount > 0) {
+      const token = await getToken(); // Adjust Kinde authentication as needed
+      dispatch(
         createSubtraction({
           filamentId,
           subtractionAmount,
           token,
         })
-      ).unwrap();
+      );
       setSubtractionAmount("");
-      toast.success("Subtraction successful!");
-      onClose();
-    } catch (error) {
-      console.error("Error in subtraction:", error);
-      toast.error("Subtraction failed.");
+      closeModal();
+    } else {
+      // Show Toastify error if subtractionAmount is not positive
+      toast.error("Subtraction amount needs to be positive");
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div className="mt-3 text-center">
-          <h2 className="text-2xl font-bold mb-4">Subtract from Filament</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="subtractionAmount"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Subtraction Amount
-              </label>
-              <input
-                type="number"
-                id="subtractionAmount"
-                name="subtractionAmount"
-                value={subtractionAmount}
-                onChange={(e) => setSubtractionAmount(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Submit
-            </button>
-          </form>
-          <button onClick={onClose} className="mt-3 text-sm underline">
+    <>
+      <button
+        onClick={openModal}
+        className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded w-1/2 flex items-center justify-center "
+      >
+        <GrSubtractCircle className="text-2xl mr-1" />
+        <span className="text-xs">Quick Sub</span>
+      </button>
+      <ReactModal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Subtract Filament"
+        className="Modal inline-block  overflow-hidden text-left align-middle transition-all transform bg-gray-800  rounded-2xl"
+        overlayClassName="Overlay fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+      >
+        <div className="p-6 max-w-sm mx-auto bg-gray-800  rounded-lg ">
+          <h2 className="text-lg font-bold mb-4 text-gray-200">
+            Quick Subtract 
+          </h2>
+          <h4 className="text-sm font-semibold mb-4 text-gray-200">
+            from {filamentName}
+          </h4>
+          <input
+            type="number"
+            value={subtractionAmount}
+            onChange={(e) => setSubtractionAmount(e.target.value)}
+            placeholder="Amount to subtract"
+            className="border border-gray-300 p-2 rounded w-full mb-4"
+          />
+          <button
+            onClick={handleSubtraction}
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+          >
+            Confirm 
+          </button>
+          <button
+            onClick={closeModal}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          >
             Close
           </button>
         </div>
-      </div>
-    </div>
+      </ReactModal>
+    </>
   );
 };
 
-export default SubtractFilamentPopup;
+SubtractionFilament.propTypes = {
+  filamentId: PropTypes.string.isRequired,
+  filamentName: PropTypes.string.isRequired,
+};
+
+export default SubtractionFilament;
