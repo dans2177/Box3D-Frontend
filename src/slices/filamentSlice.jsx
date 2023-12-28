@@ -233,14 +233,13 @@ const filamentSlice = createSlice({
         );
       })
       .addCase(updateFilament.fulfilled, (state, action) => {
-        const { _id, updatedProperty, updatedValue } = action.payload; // Payload should contain _id, updatedProperty, and updatedValue
-
-        // Find the index of the updated filament in the state
-        const index = state.items.findIndex((f) => f._id === _id);
-
+        const updatedFilament = action.payload;
+        const index = state.items.findIndex(
+          (f) => f._id === updatedFilament._id
+        );
         if (index !== -1) {
-          // Update the specified property of the filament in the state with the new value
-          state.items[index][updatedProperty] = updatedValue;
+          // Replace the entire filament object at the found index with the updated one
+          state.items[index] = updatedFilament;
         }
       })
       .addCase(getSingleFilament.fulfilled, (state, action) => {

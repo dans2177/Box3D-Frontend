@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { createSelector } from "reselect";
 import { fetchFilaments } from "../../slices/filamentSlice";
 import FilamentCard from "./FilamentCard";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
@@ -15,43 +16,51 @@ import LoadingComponent from "../Others/Loading";
 import FilamentForm from "./FilamentForm";
 import { Tooltip } from "react-tooltip";
 
+// Selector using reselect for memoization
+const selectFilamentItems = createSelector(
+  (state) => state.filament.items,
+  (items) => (items ? items.map((item) => ({ ...item })) : [])
+);
+
 const InventoryView = () => {
   const dispatch = useDispatch();
-  const filamentState = useSelector((state) => state.filament);
   const { getToken } = useKindeAuth();
   const navigate = useNavigate();
   const [showArchived, setShowArchived] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
 
+  // Get the filament items and filament state
+  const filamentItems = useSelector(selectFilamentItems);
+  const filamentState = useSelector((state) => state.filament);
+
   useEffect(() => {
     const fetchTokenAndDispatch = async () => {
       try {
         const token = await getToken();
-        if (filamentState.items.length === 0) {
-          await dispatch(fetchFilaments(token));
-        }
+        await dispatch(fetchFilaments(token));
       } catch (error) {
         console.error("Error fetching token:", error);
       }
     };
 
     fetchTokenAndDispatch();
-  }, [dispatch, getToken, filamentState.items]);
+  }, [dispatch, getToken]);
 
   const handleBackClick = () => {
     navigate("/");
   };
 
   const toggleCommandCenter = () => {
-    setIsOpen(!isOpen); // Toggles the Command Center open/close state
+    setIsOpen(!isOpen);
   };
+
   const toggleArchived = () => {
     setShowArchived(!showArchived);
   };
 
   const filamentData = showArchived
-    ? filamentState.items.filter((filament) => filament.isArchived)
-    : filamentState.items.filter((filament) => !filament.isArchived);
+    ? filamentItems.filter((filament) => filament.isArchived)
+    : filamentItems.filter((filament) => !filament.isArchived);
 
   if (filamentState.status === "loading") {
     return <LoadingComponent />;
@@ -64,7 +73,7 @@ const InventoryView = () => {
   return (
     <div className="p-4 bg-gray-700 min-h-screen relative pb-20">
       <div className="flex justify-between items-center mb-4 px-4">
-        <div className="flex items-center ">
+        <div className="flex items-center">
           <div
             className="inline-flex justify-center items-center rounded-full transition-all p-1 hover:bg-green-900"
             onClick={handleBackClick}
@@ -72,12 +81,12 @@ const InventoryView = () => {
           >
             <IoIosArrowBack size={24} className="text-green-100" />
           </div>
-
           <h2 className="text-2xl font-semibold text-green-100">
             Filament Inventory
           </h2>
         </div>
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 px-4 lg:px-8 xl:px-16 2xl:px-32">
         {filamentData && Array.isArray(filamentData) ? (
           filamentData.map((filament) => (
@@ -87,7 +96,8 @@ const InventoryView = () => {
           <p>No filaments data available.</p>
         )}
       </div>
-      {/* Command Center*/}
+
+      {/* Command Center */}
       <div
         className={`fixed bottom-0 left-0 m-4 bg-gray-800 rounded-lg p-2 flex flex-col items-center ${
           isOpen ? "space-y-2" : ""
@@ -132,8 +142,6 @@ const InventoryView = () => {
             <Tooltip id="settings-tooltip" place="right" effect="solid" />
           </>
         )}
-
-        
       </div>
     </div>
   );

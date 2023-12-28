@@ -27,8 +27,30 @@ const SingleFilament = () => {
     : 0;
   const initialNote = filament?.notes || "";
   const [editedNote, setEditedNote] = useState(initialNote);
-  const [isArchived, setIsArchived] = useState(filament?.isArchived || false);
+  const [isArchived, setIsArchived] = useState(filament?.isArchived);
   const [noteEdited, setNoteEdited] = useState(false);
+
+const handleArchive = async () => {
+  try {
+    const token = await getToken();
+    const updateData = {
+      ...filament,
+      isArchived: !isArchived,
+    };
+    await dispatch(
+      updateFilament({ filamentData: updateData, token })
+    ).unwrap();
+    setIsArchived(!isArchived);
+    // Update toast message based on the new state of isArchived
+    toast.success(
+      isArchived ? "Unarchived successfully!" : "Archived successfully!"
+    );
+  } catch (error) {
+    toast.error("Error in archiving.");
+    console.error("Error archiving:", error);
+  }
+};
+
 
   useEffect(() => {
     const fetchTokenAndFilament = async () => {
@@ -136,7 +158,7 @@ const SingleFilament = () => {
                 Edit
               </button>
               <button
-                onClick={() => setIsArchived(!isArchived)}
+                onClick={handleArchive}
                 className={`text-white py-2 px-4 rounded flex items-center justify-center min-w-[140px] max-w-[140px] truncate overflow-hidden ${
                   isArchived
                     ? "bg-red-500 hover:bg-red-600"
@@ -185,7 +207,10 @@ const SingleFilament = () => {
                 <h3 className="text-xl font-bold text-gray-200 mt-4 mb-2">
                   Subtractions
                 </h3>
-                <SubtractionFilament filamentId={filament._id} filamentName={filament.name} />
+                <SubtractionFilament
+                  filamentId={filament._id}
+                  filamentName={filament.name}
+                />
               </div>
               {filament.subtractions.map((subtraction) => (
                 <div

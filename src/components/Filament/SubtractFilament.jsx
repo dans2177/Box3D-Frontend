@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 ReactModal.setAppElement("#root");
 
-const SubtractionFilament = ({ filamentId, filamentName }) => {
+const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [subtractionAmount, setSubtractionAmount] = useState("");
   const dispatch = useDispatch();
@@ -21,16 +21,22 @@ const SubtractionFilament = ({ filamentId, filamentName }) => {
   const handleSubtraction = async () => {
     // Check if subtractionAmount is positive
     if (subtractionAmount > 0) {
-      const token = await getToken(); // Adjust Kinde authentication as needed
-      dispatch(
-        createSubtraction({
-          filamentId,
-          subtractionAmount,
-          token,
-        })
-      );
-      setSubtractionAmount("");
-      closeModal();
+      // Check if subtractionAmount is less than currentAmount
+      if (subtractionAmount <= currentAmount) {
+        const token = await getToken(); // Adjust Kinde authentication as needed
+        dispatch(
+          createSubtraction({
+            filamentId,
+            subtractionAmount,
+            token,
+          })
+        );
+        setSubtractionAmount("");
+        closeModal();
+      } else {
+        // Show Toastify error if subtractionAmount is not less than currentAmount
+        toast.error("Subtraction amount must be less than current amount");
+      }
     } else {
       // Show Toastify error if subtractionAmount is not positive
       toast.error("Subtraction amount needs to be positive");
@@ -55,7 +61,7 @@ const SubtractionFilament = ({ filamentId, filamentName }) => {
       >
         <div className="p-6 max-w-sm mx-auto bg-gray-800  rounded-lg ">
           <h2 className="text-lg font-bold mb-4 text-gray-200">
-            Quick Subtract 
+            Quick Subtract
           </h2>
           <h4 className="text-sm font-semibold mb-4 text-gray-200">
             from {filamentName}
@@ -71,7 +77,7 @@ const SubtractionFilament = ({ filamentId, filamentName }) => {
             onClick={handleSubtraction}
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
           >
-            Confirm 
+            Confirm
           </button>
           <button
             onClick={closeModal}
@@ -88,6 +94,7 @@ const SubtractionFilament = ({ filamentId, filamentName }) => {
 SubtractionFilament.propTypes = {
   filamentId: PropTypes.string.isRequired,
   filamentName: PropTypes.string.isRequired,
+  currentAmount: PropTypes.number.isRequired,
 };
 
 export default SubtractionFilament;

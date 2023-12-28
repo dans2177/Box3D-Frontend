@@ -61,7 +61,11 @@ const FilamentCard = ({ filament }) => {
         {filament.currentAmount}g
       </div>
       <div className="flex justify-between text-sm mt-1 mb-2">
-        <SubtractionFilament filamentId={filament._id} filamentName={filament.name} />
+        <SubtractionFilament
+          filamentId={filament._id}
+          filamentName={filament.name}
+          currentAmount={filament.currentAmount}
+        />
         <Link
           to={`/filament/${filament._id}`}
           className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded w-1/2 ml-1 flex items-center justify-center "

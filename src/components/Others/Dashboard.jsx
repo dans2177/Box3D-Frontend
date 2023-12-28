@@ -6,7 +6,6 @@ import { FiArrowRight } from "react-icons/fi"; // Importing right arrow icon
 import { IoIosSettings } from "react-icons/io"; // Importing settings icon
 import { Tooltip } from "react-tooltip"; // Importing tooltip component
 
-
 const Dashboard = () => {
   const navigate = useNavigate();
 
@@ -17,8 +16,6 @@ const Dashboard = () => {
       navigate("/projects");
     }
   };
-
-
 
   return (
     <div className="flex flex-col h-screen bg-gray-200">
@@ -73,13 +70,9 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <p className="text-sm md:text-md p-2 font-sans text-center pb-8">
-        More features coming soon!
-      </p>
+    
       {/* Command Center*/}
       <div className="fixed bottom-0 left-0 m-4 rounded-lg p-2 flex flex-col items-center space-y-2">
-       
-
         <button
           data-tooltip-id="settings-tooltip" // specify tooltip id
           data-tooltip-content="Settings" // tooltip content
