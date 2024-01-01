@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { SliderPicker } from "react-color";
 import { addFilament } from "../../slices/filamentSlice";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
@@ -8,17 +8,11 @@ import "react-toastify/dist/ReactToastify.css";
 import Modal from "react-modal";
 import { FaTimes } from "react-icons/fa";
 import Select from "react-select";
-import { updateFilament } from "../../slices/filamentSlice";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 
-const FilamentForm = ({ filamentId, isOpen, onClose }) => {
+const FilamentForm = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { getToken } = useKindeAuth();
-  const filament = useSelector((state) =>
-    state.filament.items.find((item) => item._id === filamentId)
-  );
-  const navigate = useNavigate;
   const [filamentData, setFilamentData] = useState({
     name: "",
     type: "",
@@ -34,29 +28,6 @@ const FilamentForm = ({ filamentId, isOpen, onClose }) => {
     customMaterial: "",
     customStartingAmount: "",
   });
-
-  useEffect(() => {
-    if (filament) {
-      setFilamentData(filament); // Load existing data if editing
-    } else {
-      // Reset to initial state if adding new filament
-      setFilamentData({
-        name: "",
-        type: "",
-        temperature: 215,
-        length: 0,
-        color: "#FFFFFF",
-        link: "",
-        material: "",
-        startingAmount: "",
-        notes: "",
-        size: "",
-        customLink: "",
-        customMaterial: "",
-        customStartingAmount: "",
-      });
-    }
-  }, [filament]);
 
   const materialOptions = [
     { value: "PLA", label: "PLA - Polylactic Acid" },
@@ -79,20 +50,15 @@ const FilamentForm = ({ filamentId, isOpen, onClose }) => {
     { value: "1.75", label: "1.75 mm" },
     { value: "3", label: "3 mm" },
   ];
+
   const [error, setError] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    // Check if the field being changed is the ID field and limit its length to 5
     if (name === "name" && value.length > 5) {
       return; // Prevent updating the state if the length exceeds 5
     }
-
-    setFilamentData({
-      ...filamentData,
-      [name]: value,
-    });
+    setFilamentData({ ...filamentData, [name]: value });
   };
 
   const handleColorChange = (color) => {
@@ -116,53 +82,36 @@ const FilamentForm = ({ filamentId, isOpen, onClose }) => {
       new URL(string);
       return true;
     } catch (_) {
-      return false; // returns false if string is not a valid URL
+      return false;
     }
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
 
-    // Required fields validation
     if (!filamentData.name) {
-      setError("* fields are required.");
+      setError("* Name is required.");
       return;
     }
-    // URL Validation for the Link field
+
     if (filamentData.link && !isValidUrl(filamentData.link)) {
-      setError("Please enter a valid URL for the Link.");
+      setError("Please enter a valid URL.");
       return;
     }
+
     const token = await getToken();
+
     try {
-      let result;
-      if (filament) {
-        // Editing existing filament
-        result = await dispatch(
-          updateFilament({
-            filamentData: { ...filamentData, _id: filamentId },
-            token,
-          })
-        );
-        navigate(-1); // Go back to the previous page or handle navigation as needed
-      } else {
-        // Adding new filament
-        result = await dispatch(addFilament({ filamentData, token }));
-      }
+      const result = await dispatch(addFilament({ filamentData, token }));
       if (result.type.includes("fulfilled")) {
-        toast.success(
-          `Filament ${filament ? "updated" : "added"} successfully`
-        );
+        toast.success("Filament added successfully");
         onClose();
       } else {
-        toast.error(`Error ${filament ? "updating" : "adding"} filament`);
+        toast.error("Error adding filament");
       }
     } catch (error) {
-      console.error(
-        `Error ${filament ? "updating" : "adding"} filament:`,
-        error
-      );
-      toast.error(`Error ${filament ? "updating" : "adding"} filament`);
+      console.error("Error adding filament:", error);
+      toast.error("Error adding filament");
     }
   };
 

@@ -17,7 +17,6 @@ import SubtractionFilament from "./SubtractFilament";
 import Overlay from "../../assets/Overlay.png";
 import { MdArchive } from "react-icons/md";
 import { FiEdit, FiTrash } from "react-icons/fi";
-import FilamentForm from "./FilamentForm";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import CountUp from "react-countup";
 
@@ -32,18 +31,11 @@ const SingleFilament = () => {
     state.filament.items.find((item) => item._id === filamentId)
   );
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editedNote, setEditedNote] = useState("");
-  const [isArchived, setIsArchived] = useState(false);
+  const [isArchived, setIsArchived] = useState(filament.isArchived);
   const [noteEdited, setNoteEdited] = useState(false);
 
-  const openEditModal = () => {
-    setIsEditModalOpen(true);
-  };
 
-  const closeEditModal = () => {
-    setIsEditModalOpen(false);
-  };
 
   const handleDeleteSubtraction = async (subtractionId) => {
     try {
@@ -79,25 +71,27 @@ const SingleFilament = () => {
     ? (filament.currentAmount / filament.startingAmount) * 100
     : 0;
 
-  const handleArchive = async () => {
-    try {
-      const token = await getToken();
-      const updateData = {
-        ...filament,
-        isArchived: !isArchived,
-      };
+const handleArchive = async () => {
+  try {
+    const token = await getToken();
+    const updateData = {
+      ...filament,
+      isArchived: !isArchived, // Update the archived status
+    };
 
-      // Dispatch the updateFilament action to update the filament data
-      await dispatch(updateFilament({ filamentData: updateData, token }));
-      setIsArchived(!isArchived);
-      toast.success(
-        isArchived ? "Unarchived successfully!" : "Archived successfully!"
-      );
-    } catch (error) {
-      toast.error("Error in archiving.");
-      console.error("Error archiving:", error);
-    }
-  };
+    await dispatch(updateFilament({ filamentData: updateData, token }));
+    setIsArchived(!isArchived); // Toggle the local archived state
+    toast.success(
+      !isArchived
+        ? "Filament archived successfully!"
+        : "Filament unarchived successfully!"
+    );
+  } catch (error) {
+    toast.error("Error in archiving.");
+    console.error("Error archiving:", error);
+  }
+};
+
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -229,7 +223,6 @@ const SingleFilament = () => {
             />
             <div className="ml-4 flex flex-col items-start">
               <button
-                onClick={openEditModal}
                 className="text-white py-2 px-4 rounded mb-2 flex items-center justify-center min-w-[140px] max-w-[140px] truncate overflow-hidden bg-blue-600 hover:bg-blue-700"
               >
                 <FiEdit className="mr-2" />
@@ -335,13 +328,6 @@ const SingleFilament = () => {
             </div>
           </div>
         </div>
-        {isEditModalOpen && (
-          <FilamentForm
-            filamentId={filamentId}
-            isOpen={isEditModalOpen}
-            onClose={closeEditModal}
-          />
-        )}
       </div>
     </div>
   );

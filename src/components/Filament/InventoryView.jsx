@@ -31,36 +31,22 @@ const InventoryView = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [showFilamentForm, setShowFilamentForm] = useState(false);
 
-  const openFilamentForm = () => {
-    setShowFilamentForm(true);
-  };
-
-  const closeFilamentForm = () => {
-    setShowFilamentForm(false);
-  };
-
   // Get the filament items and filament state
   const filamentItems = useSelector(selectFilamentItems);
   const filamentState = useSelector((state) => state.filament);
 
   useEffect(() => {
-    const fetchTokenAndDispatch = async () => {
+    const fetchData = async () => {
       try {
         const token = await getToken();
-        // Check if filaments are already loaded in the state
-        if (filamentState.status !== "success") {
-          await dispatch(fetchFilaments(token));
-        }
+        await dispatch(fetchFilaments(token));
       } catch (error) {
         console.error("Error fetching token:", error);
       }
     };
 
-    // Only fetch filaments when the component mounts
-    if (!filamentItems.length) {
-      fetchTokenAndDispatch();
-    }
-  }, [dispatch, getToken, filamentItems, filamentState]);
+    fetchData();
+  }, [dispatch, getToken]);
 
   const handleBackClick = () => {
     navigate("/");
@@ -95,9 +81,9 @@ const InventoryView = () => {
             onClick={handleBackClick}
             style={{ margin: "0 10px" }}
           >
-            <IoIosArrowBack size={24} className="text-green-700" />
+            <IoIosArrowBack size={24} className="text-gray-100" />
           </div>
-          <h2 className="text-2xl font-semibold text-green-700">
+          <h2 className="text-2xl font-semibold text-gray-100">
             Filament Inventory
           </h2>
         </div>
@@ -129,11 +115,10 @@ const InventoryView = () => {
             <IoIosArrowUp className="text-white" size={28} />
           )}
         </button>
-
         {isOpen && (
           <>
             <button
-              onClick={openFilamentForm}
+              onClick={() => setShowFilamentForm(true)}
               data-tooltip-id="add-button-tooltip"
               data-tooltip-content="Add Item"
               className="bg-green-500 text-white hover:bg-green-600 rounded-full p-2 inline-flex items-center justify-center transition duration-200"
@@ -167,7 +152,10 @@ const InventoryView = () => {
           </>
         )}
         {showFilamentForm && (
-          <FilamentForm isOpen={openFilamentForm} onClose={closeFilamentForm} filamentId={null} />
+          <FilamentForm
+            isOpen={showFilamentForm}
+            onClose={() => setShowFilamentForm(false)} // Close the form
+          />
         )}
       </div>
     </div>

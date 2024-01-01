@@ -95,31 +95,32 @@ export const deleteFilament = createAsyncThunk(
 // Get Single Filament
 export const getSingleFilament = createAsyncThunk(
   "filament/getSingleFilament",
-  async ({ filamentId, token }, { getState }) => {
+  async ({ filamentId, token }, { getState, dispatch }) => {
     const state = getState();
     const existingFilament = state.filament.items.find(
       (f) => f._id === filamentId
     );
+
+    // If filament is already in the state, return it
     if (existingFilament) {
       return existingFilament;
     }
 
-    const response = await fetch(
-      `http://localhost:3000/filament-data/${filamentId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    // If not found, refresh all filaments and then find the specific one
+    await dispatch(fetchFilaments(token));
+    const updatedState = getState();
+    const refreshedFilament = updatedState.filament.items.find(
+      (f) => f._id === filamentId
     );
 
-    if (!response.ok) {
-      throw new Error("Error fetching single filament");
+    if (refreshedFilament) {
+      return refreshedFilament;
+    } else {
+      throw new Error("Filament not found after refresh");
     }
-
-    return response.json();
   }
 );
+
 
 // Create Subtraction
 export const createSubtraction = createAsyncThunk(
