@@ -18,9 +18,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-200">
+    <div className="flex flex-col min-h-screen bg-gray-200 pb-20">
       {/* Top Bar */}
-      <div className="flex flex-col items-center w-full px-4 py-2  fixed top-0 z-10">
+      <div className="flex flex-col items-center w-full px-4 py-2 top-0 z-10">
         <img
           className="h-16 md:h-24"
           src={DashboardLogo}
@@ -30,7 +30,7 @@ const Dashboard = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-grow flex items-center justify-center pt-28 md:pt-32">
+      <div className="flex-grow flex items-center justify-center ">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
           {/* Projects Tile */}
           <div className="bg-gray-800 rounded-lg shadow-md hover:bg-gray-900 cursor-pointer relative">
@@ -70,7 +70,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    
+
       {/* Command Center*/}
       <div className="fixed bottom-0 left-0 m-4 rounded-lg p-2 flex flex-col items-center space-y-2">
         <button

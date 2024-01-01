@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import { fetchFilaments } from "../../slices/filamentSlice";
@@ -10,11 +10,12 @@ import {
   IoIosArrowDown,
   IoIosArrowUp,
   IoIosArrowBack,
+  IoIosAdd,
 } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../Others/Loading";
-import FilamentForm from "./FilamentForm";
 import { Tooltip } from "react-tooltip";
+import FilamentForm from "./FilamentForm.jsx";
 
 // Selector using reselect for memoization
 const selectFilamentItems = createSelector(
@@ -28,6 +29,15 @@ const InventoryView = () => {
   const navigate = useNavigate();
   const [showArchived, setShowArchived] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
+  const [showFilamentForm, setShowFilamentForm] = useState(false);
+
+  const openFilamentForm = () => {
+    setShowFilamentForm(true);
+  };
+
+  const closeFilamentForm = () => {
+    setShowFilamentForm(false);
+  };
 
   // Get the filament items and filament state
   const filamentItems = useSelector(selectFilamentItems);
@@ -37,14 +47,20 @@ const InventoryView = () => {
     const fetchTokenAndDispatch = async () => {
       try {
         const token = await getToken();
-        await dispatch(fetchFilaments(token));
+        // Check if filaments are already loaded in the state
+        if (filamentState.status !== "success") {
+          await dispatch(fetchFilaments(token));
+        }
       } catch (error) {
         console.error("Error fetching token:", error);
       }
     };
 
-    fetchTokenAndDispatch();
-  }, [dispatch, getToken]);
+    // Only fetch filaments when the component mounts
+    if (!filamentItems.length) {
+      fetchTokenAndDispatch();
+    }
+  }, [dispatch, getToken, filamentItems, filamentState]);
 
   const handleBackClick = () => {
     navigate("/");
@@ -79,9 +95,9 @@ const InventoryView = () => {
             onClick={handleBackClick}
             style={{ margin: "0 10px" }}
           >
-            <IoIosArrowBack size={24} className="text-green-100" />
+            <IoIosArrowBack size={24} className="text-green-700" />
           </div>
-          <h2 className="text-2xl font-semibold text-green-100">
+          <h2 className="text-2xl font-semibold text-green-700">
             Filament Inventory
           </h2>
         </div>
@@ -116,7 +132,15 @@ const InventoryView = () => {
 
         {isOpen && (
           <>
-            <FilamentForm />
+            <button
+              onClick={openFilamentForm}
+              data-tooltip-id="add-button-tooltip"
+              data-tooltip-content="Add Item"
+              className="bg-green-500 text-white hover:bg-green-600 rounded-full p-2 inline-flex items-center justify-center transition duration-200"
+            >
+              <IoIosAdd size={28} />
+            </button>
+            <Tooltip id="add-button-tooltip" place="right" effect="solid" />
             <button
               data-tooltip-id="archive-tooltip"
               data-tooltip-content={
@@ -141,6 +165,9 @@ const InventoryView = () => {
             <Tooltip id="archive-tooltip" place="right" effect="solid" />
             <Tooltip id="settings-tooltip" place="right" effect="solid" />
           </>
+        )}
+        {showFilamentForm && (
+          <FilamentForm isOpen={openFilamentForm} onClose={closeFilamentForm} filamentId={null} />
         )}
       </div>
     </div>

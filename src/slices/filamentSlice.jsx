@@ -1,6 +1,7 @@
 // In filamentSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+//Fetch All User Filaments
 export const fetchFilaments = createAsyncThunk(
   "filament/fetchFilaments",
   async (token) => {
@@ -9,14 +10,15 @@ export const fetchFilaments = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.json(); // Correct usage
+    return response.json();
   }
 );
 
-// Update filament
+// Update User Filament
 export const updateFilament = createAsyncThunk(
   "filament/updateFilament",
   async ({ filamentData, token }) => {
+    // Add { dispatch }
     const response = await fetch(
       `http://localhost:3000/filament-data/${filamentData._id}`,
       {
@@ -28,14 +30,21 @@ export const updateFilament = createAsyncThunk(
         body: JSON.stringify(filamentData),
       }
     );
-    return response.json();
+
+    if (!response.ok) {
+      throw new Error("Error updating filament");
+    }
+
+    const updatedFilament = await response.json();
+
+    return updatedFilament;
   }
 );
 
-// Modify addFilament action creator
+// Create User Filament
 export const addFilament = createAsyncThunk(
   "filament/addFilament",
-  async ({ filamentData, token }, { dispatch }) => {
+  async ({ filamentData, token }) => {
     try {
       const response = await fetch("http://localhost:3000/filament-data", {
         method: "POST",
@@ -55,7 +64,6 @@ export const addFilament = createAsyncThunk(
       console.log(responseData); // Debug log
 
       if (responseData.filament && responseData.filament._id) {
-        dispatch(fetchFilaments(token)); // Dispatch a "filament refresh" action to update the state
         return responseData.filament;
       } else {
         throw new Error("Invalid response from the backend");
@@ -158,29 +166,10 @@ export const getSubtractions = createAsyncThunk(
   }
 );
 
-// Update Subtraction
-export const updateSubtraction = createAsyncThunk(
-  "filament/updateSubtraction",
-  async ({ filamentId, subtractionId, updateData, token }) => {
-    const response = await fetch(
-      `http://localhost:3000/filament-data/${filamentId}/subtraction/${subtractionId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updateData),
-      }
-    );
-    return response.json();
-  }
-);
-
 // Delete Subtraction
 export const deleteSubtraction = createAsyncThunk(
   "filament/deleteSubtraction",
-  async ({ filamentId, subtractionId, token }) => {
+  async ({ filamentId, subtractionId, token }, { dispatch }) => {
     const response = await fetch(
       `http://localhost:3000/filament-data/${filamentId}/subtraction/${subtractionId}`,
       {
@@ -190,7 +179,15 @@ export const deleteSubtraction = createAsyncThunk(
         },
       }
     );
-    return { filamentId, subtractionId }, response.json(); // Return both IDs for state update
+
+    if (!response.ok) {
+      throw new Error("Error deleting subtraction");
+    }
+
+    // Dispatch getSingleFilament to refresh the SingleFilament page
+    dispatch(getSingleFilament({ filamentId, token }));
+
+    return { filamentId, subtractionId };
   }
 );
 
@@ -221,37 +218,52 @@ const filamentSlice = createSlice({
       })
       .addCase(addFilament.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items.push(action.payload); // Add the new filament to the state
+        state.items.push(action.payload);
       })
       .addCase(addFilament.rejected, (state, action) => {
         state.error = action.error.message;
       })
       .addCase(deleteFilament.fulfilled, (state, action) => {
-        const deletedFilamentId = action.payload.filamentId; // Make sure the payload contains filamentId
+        const deletedFilamentId = action.payload.filamentId;
         state.items = state.items.filter(
           (filament) => filament._id !== deletedFilamentId
         );
       })
       .addCase(updateFilament.fulfilled, (state, action) => {
         const updatedFilament = action.payload;
-        const index = state.items.findIndex(
+        // Find the index of the filament to be updated
+        const filamentIndex = state.items.findIndex(
           (f) => f._id === updatedFilament._id
         );
-        if (index !== -1) {
-          // Replace the entire filament object at the found index with the updated one
-          state.items[index] = updatedFilament;
+        if (filamentIndex !== -1) {
+          // Update the filament in the state with the new data
+          state.items[filamentIndex] = updatedFilament;
+
+          // Recalculate the currentAmount
+          const updatedItem = state.items[filamentIndex];
+          const totalSubtractedLength = updatedItem.subtractions.reduce(
+            (total, subtraction) => total + subtraction.subtractionLength,
+            0
+          );
+          updatedItem.currentAmount =
+            updatedItem.startingAmount - totalSubtractedLength;
         }
       })
       .addCase(getSingleFilament.fulfilled, (state, action) => {
-        const index = state.items.findIndex(
-          (f) => f._id === action.payload._id
+        const updatedFilament = action.payload;
+        const existingFilamentIndex = state.items.findIndex(
+          (f) => f._id === updatedFilament._id
         );
-        if (index !== -1) {
-          state.items[index] = action.payload;
+
+        if (existingFilamentIndex !== -1) {
+          // Replace the existing filament
+          state.items[existingFilamentIndex] = updatedFilament;
         } else {
-          state.items.push(action.payload);
+          // Filament doesn't exist, push it
+          state.items.push(updatedFilament);
         }
       })
+
       .addCase(createSubtraction.fulfilled, (state, action) => {
         const { filamentId, newSubtraction } = action.payload;
         const index = state.items.findIndex((f) => f._id === filamentId);
@@ -276,30 +288,25 @@ const filamentSlice = createSlice({
           state.items[index].subtractions = action.payload.subtractions;
         }
       })
-      .addCase(updateSubtraction.fulfilled, (state, action) => {
-        const filamentIndex = state.items.findIndex(
-          (f) => f._id === action.meta.arg.filamentId
-        );
-        if (filamentIndex !== -1) {
-          const subtractionIndex = state.items[
-            filamentIndex
-          ].subtractions.findIndex(
-            (s) => s._id === action.meta.arg.subtractionId
-          );
-          if (subtractionIndex !== -1) {
-            state.items[filamentIndex].subtractions[subtractionIndex] =
-              action.payload;
-          }
-        }
-      })
       .addCase(deleteSubtraction.fulfilled, (state, action) => {
+        const { filamentId, subtractionId } = action.payload;
         const filamentIndex = state.items.findIndex(
-          (f) => f._id === action.meta.arg.filamentId
+          (f) => f._id === filamentId
         );
         if (filamentIndex !== -1) {
           state.items[filamentIndex].subtractions = state.items[
             filamentIndex
-          ].subtractions.filter((s) => s._id !== action.meta.arg.subtractionId);
+          ].subtractions.filter((s) => s._id !== subtractionId);
+
+          // Recalculate the currentAmount after the subtraction delete
+          const totalSubtractedLength = state.items[
+            filamentIndex
+          ].subtractions.reduce(
+            (total, subtraction) => total + subtraction.subtractionLength,
+            0
+          );
+          state.items[filamentIndex].currentAmount =
+            state.items[filamentIndex].startingAmount - totalSubtractedLength;
         }
       });
   },

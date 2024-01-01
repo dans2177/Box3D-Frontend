@@ -18,30 +18,39 @@ const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
   const closeModal = () => setModalIsOpen(false);
   const { getToken } = useKindeAuth();
 
-  const handleSubtraction = async () => {
-    // Check if subtractionAmount is positive
-    if (subtractionAmount > 0) {
-      // Check if subtractionAmount is less than currentAmount
-      if (subtractionAmount <= currentAmount) {
-        const token = await getToken(); // Adjust Kinde authentication as needed
-        dispatch(
-          createSubtraction({
-            filamentId,
-            subtractionAmount,
-            token,
-          })
-        );
-        setSubtractionAmount("");
-        closeModal();
-      } else {
-        // Show Toastify error if subtractionAmount is not less than currentAmount
-        toast.error("Subtraction amount must be less than current amount");
-      }
-    } else {
-      // Show Toastify error if subtractionAmount is not positive
-      toast.error("Subtraction amount needs to be positive");
-    }
-  };
+ const handleSubtraction = async () => {
+   // Check if subtractionAmount is positive
+   if (subtractionAmount > 0) {
+     // Check if subtractionAmount is less than or equal to currentAmount
+     if (subtractionAmount <= currentAmount) {
+       try {
+         const token = await getToken(); // Adjust Kinde authentication as needed
+         await dispatch(
+           createSubtraction({
+             filamentId,
+             subtractionAmount,
+             token,
+           })
+         );
+         setSubtractionAmount(""); // Clear input field after successful subtraction
+         closeModal();
+          toast.success("Subtraction successful!");
+       } catch (error) {
+         console.error("Error performing subtraction:", error);
+         // Handle the error appropriately, e.g., show an error message
+         toast.error("An error occurred while performing the subtraction");
+       }
+     } else {
+       // Show Toastify error if subtractionAmount is not less than or equal to currentAmount
+       toast.error(
+         "Subtraction amount must be less than or equal to current amount"
+       );
+     }
+   } else {
+     // Show Toastify error if subtractionAmount is not positive
+     toast.error("Subtraction amount needs to be positive");
+   }
+ };
 
   return (
     <>
@@ -50,7 +59,7 @@ const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
         className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded w-1/2 flex items-center justify-center "
       >
         <GrSubtractCircle className="text-2xl mr-1" />
-        <span className="text-xs">Quick Sub</span>
+        <span className="text-xs">Quick Subtract</span>
       </button>
       <ReactModal
         isOpen={modalIsOpen}
