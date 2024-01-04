@@ -14,6 +14,22 @@ export const fetchFilaments = createAsyncThunk(
   }
 );
 
+// Function to fetch a single filament by ID
+const fetchSingleFilament = async (filamentId, token) => {
+  const response = await fetch(`/api/filaments/${filamentId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch filament: ${response.status}`);
+  }
+
+  return response.json();
+};
+
 // Update User Filament
 export const updateFilament = createAsyncThunk(
   "filament/updateFilament",
@@ -106,21 +122,15 @@ export const getSingleFilament = createAsyncThunk(
       return existingFilament;
     }
 
-    // If not found, refresh all filaments and then find the specific one
-    await dispatch(fetchFilaments(token));
-    const updatedState = getState();
-    const refreshedFilament = updatedState.filament.items.find(
-      (f) => f._id === filamentId
-    );
-
-    if (refreshedFilament) {
-      return refreshedFilament;
-    } else {
-      throw new Error("Filament not found after refresh");
+    // If not found, fetch the specific filament by ID
+    try {
+      const response = await fetchSingleFilament(filamentId, token);
+      return response.data; // Assuming your API response has a "data" property
+    } catch (error) {
+      throw new Error("Error fetching filament: " + error.message);
     }
   }
 );
-
 
 // Create Subtraction
 export const createSubtraction = createAsyncThunk(
@@ -239,7 +249,10 @@ const filamentSlice = createSlice({
         if (filamentIndex !== -1) {
           // Update the filament in the state with the new data
           state.items[filamentIndex] = updatedFilament;
-
+          state.items[filamentIndex] = {
+            ...state.items[filamentIndex],
+            ...action.payload,
+          };
           // Recalculate the currentAmount
           const updatedItem = state.items[filamentIndex];
           const totalSubtractedLength = updatedItem.subtractions.reduce(

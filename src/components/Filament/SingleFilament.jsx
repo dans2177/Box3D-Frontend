@@ -4,20 +4,18 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  getSingleFilament,
   updateFilament,
   deleteSubtraction,
   deleteFilament,
 } from "../../slices/filamentSlice";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { toast } from "react-toastify";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaExternalLinkAlt } from "react-icons/fa";
+import { MdArchive } from "react-icons/md";
+import { FiEdit, FiTrash } from "react-icons/fi";
 import LoadingComponent from "../Others/Loading";
 import SubtractionFilament from "./SubtractFilament";
 import Overlay from "../../assets/Overlay.png";
-import { MdArchive } from "react-icons/md";
-import { FiEdit, FiTrash } from "react-icons/fi";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import CountUp from "react-countup";
 
 // ----------------------------------------------------------------
@@ -26,16 +24,29 @@ const SingleFilament = () => {
   const { filamentId } = useParams();
   const dispatch = useDispatch();
   const { getToken } = useKindeAuth();
+  const navigate = useNavigate();
   const loading = useSelector((state) => state.filament.status === "loading");
-  const filament = useSelector((state) =>
+  const reduxFilament = useSelector((state) =>
     state.filament.items.find((item) => item._id === filamentId)
   );
 
-  const [editedNote, setEditedNote] = useState("");
-  const [isArchived, setIsArchived] = useState(filament.isArchived);
+  // Local state to mirror filament data from Redux
+  const [localFilament, setLocalFilament] = useState(reduxFilament || {});
+
+  useEffect(() => {
+    setLocalFilament(reduxFilament || {});
+  }, [reduxFilament]);
+
+  const [editedNote, setEditedNote] = useState(localFilament.notes || "");
+  const [isArchived, setIsArchived] = useState(
+    localFilament.isArchived || false
+  );
   const [noteEdited, setNoteEdited] = useState(false);
-
-
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(localFilament.name || "");
+  const [editedTemp, setEditedTemp] = useState(localFilament.temperature || 0);
+  const [editedLink, setEditedLink] = useState(localFilament.link || "");
+  const [editedColor, setEditedColor] = useState(localFilament.color || "");
 
   const handleDeleteSubtraction = async (subtractionId) => {
     try {
@@ -49,7 +60,6 @@ const SingleFilament = () => {
   };
 
   const handleDeleteFilament = async () => {
-    // Display a confirmation dialog before proceeding with deletion
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this filament?"
     );
@@ -59,7 +69,7 @@ const SingleFilament = () => {
         const token = await getToken();
         await dispatch(deleteFilament({ filamentId, token }));
         toast.success("Filament deleted successfully!");
-        navigate(-1); // Go back to the previous page or handle navigation as needed
+        navigate(-1);
       } catch (error) {
         toast.error("Error deleting filament.");
         console.error("Error deleting filament:", error);
@@ -67,31 +77,30 @@ const SingleFilament = () => {
     }
   };
 
-  const remainingPercentage = filament
-    ? (filament.currentAmount / filament.startingAmount) * 100
+  const remainingPercentage = localFilament
+    ? (localFilament.currentAmount / localFilament.startingAmount) * 100
     : 0;
 
-const handleArchive = async () => {
-  try {
-    const token = await getToken();
-    const updateData = {
-      ...filament,
-      isArchived: !isArchived, // Update the archived status
-    };
+  const handleArchive = async () => {
+    try {
+      const token = await getToken();
+      const updateData = {
+        ...localFilament,
+        isArchived: !isArchived,
+      };
 
-    await dispatch(updateFilament({ filamentData: updateData, token }));
-    setIsArchived(!isArchived); // Toggle the local archived state
-    toast.success(
-      !isArchived
-        ? "Filament archived successfully!"
-        : "Filament unarchived successfully!"
-    );
-  } catch (error) {
-    toast.error("Error in archiving.");
-    console.error("Error archiving:", error);
-  }
-};
-
+      await dispatch(updateFilament({ filamentData: updateData, token }));
+      setIsArchived(!isArchived);
+      toast.success(
+        !isArchived
+          ? "Filament archived successfully!"
+          : "Filament unarchived successfully!"
+      );
+    } catch (error) {
+      toast.error("Error in archiving.");
+      console.error("Error archiving:", error);
+    }
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -101,61 +110,48 @@ const handleArchive = async () => {
     }
   };
 
-  const navigate = useNavigate();
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+    if (isEditing) {
+      setEditedName(localFilament.name);
+      setEditedTemp(localFilament.temperature);
+      setEditedLink(localFilament.link || "");
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const updatedColor = editedColor || localFilament.color; // Use editedColor if it's defined, otherwise, use the current color
+
+      const updateData = {
+        _id: filamentId,
+        name: editedName,
+        temperature: editedTemp,
+        link: editedLink,
+        notes: editedNote,
+        isArchived: isArchived,
+        color: updatedColor,
+        ...localFilament,
+      };
+
+      const token = await getToken();
+      await dispatch(updateFilament({ filamentData: updateData, token }));
+      setLocalFilament(updateData); // Update the local state
+      toast.success("Filament updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      toast.error("Error updating filament.");
+      console.error("Error updating filament:", error);
+    }
+  };
 
   const handleBackClick = () => {
     navigate(-1);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = await getToken();
-        const updatedFilament = await dispatch(
-          getSingleFilament({ filamentId, token })
-        );
-
-        // Dispatch the updateFilament action to update the Redux state with the new data
-        await dispatch(updateFilament(updatedFilament));
-      } catch (error) {
-        console.error("Error fetching updated filament data:", error);
-        // Handle any errors here
-      }
-    };
-
-    fetchData();
-  }, [filamentId, getToken, dispatch]);
-
-  const handleUpdate = async () => {
-    if (!noteEdited) {
-      return;
-    }
-
-    try {
-      const token = await getToken();
-      const updateData = {
-        _id: filamentId,
-        notes: editedNote,
-        isArchived: isArchived,
-      };
-
-      // Dispatch the updateFilament action to update the filament data
-      await dispatch(updateFilament({ filamentData: updateData, token }));
-
-      toast.success("Update successful!");
-
-      setNoteEdited(false);
-      // You can access the updated filament data here in the `updatedFilament` variable
-      // Example: console.log("Updated Filament Data:", updatedFilament);
-    } catch (error) {
-      toast.error("Error updating.");
-      console.error("Error updating:", error);
-    }
-  };
-
   // ----------------------------------------------------------------
   // Views
-  if (!filament) {
+  if (!localFilament) {
     return <div>Filament Not Found :( </div>;
   }
 
@@ -178,10 +174,12 @@ const handleArchive = async () => {
             <div></div>
           </div>
 
+          {/* Filament Details */}
           <div className="flex items-center mb-4">
+            {/* Filament Image */}
             <div
               className="relative w-32 h-32 md:w-38 md:h-38 rounded-full ml-2 animate-spin hover:animate-spin-fast"
-              style={{ backgroundColor: filament.color }}
+              style={{ backgroundColor: localFilament.color }}
             >
               <img
                 src={Overlay}
@@ -189,44 +187,76 @@ const handleArchive = async () => {
                 alt="Filament Overlay"
               />
             </div>
+            {/* Filament Info */}
             <div className="ml-4 flex-grow">
               <h2 className="text-2xl font-bold text-gray-200">
-                {filament.name}
+                {isEditing ? (
+                  <div>
+                    <label>Link:</label>
+                    <input
+                      type="text"
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      className="text-white bg-gray-800 border-gray-600 border-2 p-2 m-2 h-10 w-28 rounded"
+                    />
+                  </div>
+                ) : (
+                  localFilament.name
+                )}
               </h2>
               <p className="text-gray-300">
-                Temperature: {filament.temperature}
+                Temp:
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={editedTemp}
+                    onChange={(e) => setEditedTemp(e.target.value)}
+                    className="text-white bg-gray-800 border-gray-600 border-2 p-2 m-2 h-6 w-20 rounded"
+                  />
+                ) : (
+                  editedTemp
+                )}
               </p>
               <div className="text-gray-300">
-                {filament.link ? (
-                  <a
-                    href={filament.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex items-center text-blue-500">
-                      <FaExternalLinkAlt />
-                      <span className="m-1">Link Available</span>
-                    </div>
-                  </a>
+                {isEditing ? (
+                  <div>
+                    <label>Link:</label>
+                    <input
+                      type="text"
+                      value={editedLink}
+                      onChange={(e) => setEditedLink(e.target.value)}
+                      className="text-white bg-gray-800 border-gray-600 border-2 p-2 m-2 h-6 w-48 rounded"
+                    />
+                  </div>
                 ) : (
-                  `No Link Provided`
+                  <a
+                    href={localFilament.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-500"
+                  >
+                    <FaExternalLinkAlt className="inline mr-1" />
+                    {localFilament.link ? "Link Available" : "No Link Provided"}
+                  </a>
                 )}
               </div>
             </div>
-            {/* Add the CountUp component here to display current amount */}
+            {/* CountUp for Current Amount */}
             <CountUp
               start={0}
-              end={filament.currentAmount} // Use the current amount as the end value
-              duration={2} // Specify the animation duration
-              separator="," // Use a comma as the separator
-              className="text-4xl text-gray-200 font-extrabold ml-4" // Customize the styling
+              end={localFilament.currentAmount}
+              duration={2}
+              separator=","
+              className="text-4xl text-gray-200 font-extrabold ml-4"
             />
+            {/* Edit and Archive Buttons */}
             <div className="ml-4 flex flex-col items-start">
               <button
+                onClick={toggleEdit}
                 className="text-white py-2 px-4 rounded mb-2 flex items-center justify-center min-w-[140px] max-w-[140px] truncate overflow-hidden bg-blue-600 hover:bg-blue-700"
               >
                 <FiEdit className="mr-2" />
-                Edit
+                {isEditing ? "Cancel" : "Edit"}
               </button>
               <button
                 onClick={handleArchive}
@@ -239,14 +269,23 @@ const handleArchive = async () => {
                 <MdArchive className="mr-2" />
                 {isArchived ? "Unarchive" : "Archive"}
               </button>
-              {/* Step 2: Conditionally render the "Delete" button */}
+              {/* Save Button */}
+              {isEditing && (
+                <button
+                  onClick={handleSave}
+                  className="text-white py-2 px-4 rounded mt-2 flex items-center justify-center min-w-[140px] max-w-[140px] truncate overflow-hidden bg-orange-600 hover:bg-orange-700"
+                >
+                  Save
+                </button>
+              )}
             </div>
           </div>
 
+          {/* Remaining Percentage Bar */}
           <div className="bg-gray-200 rounded-full h-2.5 mb-4">
             <div
               style={{ width: `${remainingPercentage}%` }}
-              className="bg-blue-600 h-2.5 rounded-full"
+              className="bg-green-500 h-full rounded-full"
             ></div>
           </div>
 
@@ -261,16 +300,19 @@ const handleArchive = async () => {
                 onChange={handleInputChange}
                 className="w-full h-32 p-2 border rounded mt-2 bg-slate-800 text-gray-200"
               />
-              <button
-                onClick={handleUpdate}
-                className={` text-white py-2 px-4 rounded mt-2 mr-2 ${
-                  noteEdited
-                    ? "bg-purple-700 hover:bg-purple-800"
-                    : "bg-gray-600 "
-                }`}
-              >
-                Update Notes
-              </button>
+              {/* Update Notes Button */}
+              {noteEdited && (
+                <button
+                  onClick={handleSave}
+                  className={` text-white py-2 px-4 rounded mt-2 mr-2 ${
+                    noteEdited
+                      ? "bg-purple-700 hover:bg-purple-800"
+                      : "bg-gray-600 "
+                  }`}
+                >
+                  Update Notes
+                </button>
+              )}
               <br />
               {/* Conditionally render the "Delete" button */}
               {isArchived && (
@@ -299,32 +341,37 @@ const handleArchive = async () => {
                   Subtractions
                 </h3>
                 <SubtractionFilament
-                  filamentId={filament._id}
-                  filamentName={filament.name}
-                  currentAmount={filament.currentAmount}
+                  filamentId={filamentId}
+                  filamentName={localFilament.name}
+                  currentAmount={localFilament.currentAmount}
                 />
               </div>
-              {filament.subtractions.map((subtraction) => (
-                <div
-                  key={subtraction._id}
-                  className="mb-2 border p-2 rounded flex items-center justify-between text-gray-300 bg-red-900"
-                >
-                  <div>
-                    <span className="font-semibold">Length:</span>
-                    {subtraction.subtractionLength}g
-                  </div>
-                  <div>
-                    <span className="font-semibold">Date:</span>
-                    {new Date(subtraction.date).toLocaleDateString()}
-                  </div>
-                  <button
-                    onClick={() => handleDeleteSubtraction(subtraction._id)}
-                    className="bg-red-600 hover:bg-red-800 text-white py-1 px-2 rounded"
-                  >
-                    <FiTrash />
-                  </button>
-                </div>
-              ))}
+              {localFilament.subtractions &&
+                localFilament.subtractions.map(
+                  (
+                    subtraction // Used localFilament
+                  ) => (
+                    <div
+                      key={subtraction._id}
+                      className="mb-2 border p-2 rounded flex items-center justify-between text-gray-300 bg-red-900"
+                    >
+                      <div>
+                        <span className="font-semibold">Length:</span>
+                        {subtraction.subtractionLength}g
+                      </div>
+                      <div>
+                        <span className="font-semibold">Date:</span>
+                        {new Date(subtraction.date).toLocaleDateString()}
+                      </div>
+                      <button
+                        onClick={() => handleDeleteSubtraction(subtraction._id)}
+                        className="bg-red-600 hover:bg-red-800 text-white py-1 px-2 rounded"
+                      >
+                        <FiTrash />
+                      </button>
+                    </div>
+                  )
+                )}
             </div>
           </div>
         </div>
@@ -332,6 +379,7 @@ const handleArchive = async () => {
     </div>
   );
 };
+
 // ----------------------------------------------------------------
 // Export / Prop Validation
 export default SingleFilament;
