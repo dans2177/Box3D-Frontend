@@ -242,25 +242,20 @@ const filamentSlice = createSlice({
       })
       .addCase(updateFilament.fulfilled, (state, action) => {
         const updatedFilament = action.payload;
-        // Find the index of the filament to be updated
         const filamentIndex = state.items.findIndex(
           (f) => f._id === updatedFilament._id
         );
         if (filamentIndex !== -1) {
-          // Update the filament in the state with the new data
+          // Directly assign the updatedFilament to the state
           state.items[filamentIndex] = updatedFilament;
-          state.items[filamentIndex] = {
-            ...state.items[filamentIndex],
-            ...action.payload,
-          };
-          // Recalculate the currentAmount
-          const updatedItem = state.items[filamentIndex];
-          const totalSubtractedLength = updatedItem.subtractions.reduce(
+
+          // Recalculate currentAmount based on subtractions
+          const totalSubtractedLength = updatedFilament.subtractions.reduce(
             (total, subtraction) => total + subtraction.subtractionLength,
             0
           );
-          updatedItem.currentAmount =
-            updatedItem.startingAmount - totalSubtractedLength;
+          state.items[filamentIndex].currentAmount =
+            updatedFilament.startingAmount - totalSubtractedLength;
         }
       })
       .addCase(getSingleFilament.fulfilled, (state, action) => {

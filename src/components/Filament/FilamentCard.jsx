@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { GrView } from "react-icons/gr";
 import Overlay from "../../assets/Overlay.png";
 import SubtractionFilament from "./SubtractFilament.jsx";
+import CountUp from "react-countup";
 
 const FilamentCard = ({ filament }) => {
   const titleRef = useRef(null);
@@ -57,8 +58,21 @@ const FilamentCard = ({ filament }) => {
           </p>
         </div>
       </div>
-      <div className="text-center text-purple-200 text-2xl md:text-3xl lg:text-4xl font-bold flex items-center justify-center pt-2 pb-6">
-        {filament.currentAmount}g
+      <div className="text-center  text-2xl md:text-3xl lg:text-4xl font-bold flex items-center justify-center pt-2 pb-6">
+        <CountUp
+          start={0}
+          end={filament.currentAmount}
+          duration={1}
+          separator=","
+          className="text-4xl text-gray-200 font-extrabold ml-4"
+          style={{
+            fontFamily: "'Orbitron', sans-serif", // Use the Orbitron font
+            letterSpacing: "2px", // Adjust letter spacing for a digital look
+            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)", // Add a subtle shadow
+          }}
+        >
+          
+        </CountUp>
       </div>
       <div className="flex justify-between text-sm mt-1 mb-2">
         <SubtractionFilament

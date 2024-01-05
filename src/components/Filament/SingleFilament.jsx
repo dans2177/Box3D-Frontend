@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------
 // Imports
 import { useState, useEffect } from "react";
+import { ChromePicker } from "react-color";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -38,15 +39,14 @@ const SingleFilament = () => {
   }, [reduxFilament]);
 
   const [editedNote, setEditedNote] = useState(localFilament.notes || "");
-  const [isArchived, setIsArchived] = useState(
-    localFilament.isArchived || false
-  );
+  const [isArchived, setIsArchived] = useState(localFilament.isArchived);
   const [noteEdited, setNoteEdited] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(localFilament.name || "");
   const [editedTemp, setEditedTemp] = useState(localFilament.temperature || 0);
   const [editedLink, setEditedLink] = useState(localFilament.link || "");
   const [editedColor, setEditedColor] = useState(localFilament.color || "");
+  const [urlError, setUrlError] = useState(""); // New state for URL error
 
   const handleDeleteSubtraction = async (subtractionId) => {
     try {
@@ -101,12 +101,25 @@ const SingleFilament = () => {
       console.error("Error archiving:", error);
     }
   };
-
+  const handleColorChange = (color) => {
+    setEditedColor(color.hex);
+  };
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    if (name === "notes") {
+
+    if (name === "temperature") {
+      setEditedTemp(value);
+    } else if (name === "notes") {
       setEditedNote(value);
       setNoteEdited(true);
+    } else if (name === "link") {
+      setEditedLink(value);
+      setUrlError("");
+    } else if (name === "name") {
+      if (value.length <= 5) {
+        setEditedName(value);
+      }
+      // Optionally, you can add an else block to notify the user that the max length has been reached
     }
   };
 
@@ -120,23 +133,36 @@ const SingleFilament = () => {
   };
 
   const handleSave = async () => {
+    if (urlError) {
+      toast.error("Please fix the errors before saving.");
+      return;
+    }
     try {
-      const updatedColor = editedColor || localFilament.color; // Use editedColor if it's defined, otherwise, use the current color
-
       const updateData = {
+        ...localFilament, // Spread localFilament first
         _id: filamentId,
         name: editedName,
         temperature: editedTemp,
         link: editedLink,
         notes: editedNote,
         isArchived: isArchived,
-        color: updatedColor,
-        ...localFilament,
+        color: editedColor || localFilament.color,
       };
 
+      console.log("Updating filament with data:", updateData); // Debugging log
+      console.log("Saving with temperature:", editedTemp); // Debug log
+
       const token = await getToken();
-      await dispatch(updateFilament({ filamentData: updateData, token }));
-      setLocalFilament(updateData); // Update the local state
+      const updateResult = await dispatch(
+        updateFilament({ filamentData: updateData, token })
+      );
+      console.log("Update result:", updateResult); // Debugging log
+
+      if (updateResult.error) {
+        throw new Error("Error in dispatching updateFilament");
+      }
+
+      setLocalFilament(updateData);
       toast.success("Filament updated successfully!");
       setIsEditing(false);
     } catch (error) {
@@ -175,109 +201,131 @@ const SingleFilament = () => {
           </div>
 
           {/* Filament Details */}
-          <div className="flex items-center mb-4">
-            {/* Filament Image */}
-            <div
-              className="relative w-32 h-32 md:w-38 md:h-38 rounded-full ml-2 animate-spin hover:animate-spin-fast"
-              style={{ backgroundColor: localFilament.color }}
-            >
-              <img
-                src={Overlay}
-                className="absolute inset-0 w-full h-full"
-                alt="Filament Overlay"
-              />
-            </div>
-            {/* Filament Info */}
-            <div className="ml-4 flex-grow">
-              <h2 className="text-2xl font-bold text-gray-200">
-                {isEditing ? (
-                  <div>
-                    <label>Link:</label>
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+            {/* Filament Image, Info, and CountUp */}
+            <div className="flex items-center justify-between w-full">
+              {/* Filament Image */}
+              <div
+                className="relative w-32 h-32 md:w-38 md:h-38 rounded-full ml-2 animate-spin hover:animate-spin-fast"
+                style={{ backgroundColor: localFilament.color }}
+              >
+                <img
+                  src={Overlay}
+                  className="absolute inset-0 w-full h-full"
+                  alt="Filament Overlay"
+                />
+              </div>
+              {/* Filament Info */}
+              <div className="ml-4 flex-grow">
+                <h2 className="text-4xl pb-4 font-bold text-gray-200">
+                  {isEditing ? (
                     <input
                       type="text"
+                      name="name" // Important: This should match the handleInputChange logic
                       value={editedName}
-                      onChange={(e) => setEditedName(e.target.value)}
-                      className="text-white bg-gray-800 border-gray-600 border-2 p-2 m-2 h-10 w-28 rounded"
+                      onChange={handleInputChange}
+                      className="text-white bg-gray-800 border-gray-600 border-2 p-2 h-10 w-40 rounded"
                     />
-                  </div>
-                ) : (
-                  localFilament.name
-                )}
-              </h2>
-              <p className="text-gray-300">
-                Temp:
-                {isEditing ? (
-                  <input
-                    type="number"
-                    value={editedTemp}
-                    onChange={(e) => setEditedTemp(e.target.value)}
-                    className="text-white bg-gray-800 border-gray-600 border-2 p-2 m-2 h-6 w-20 rounded"
-                  />
-                ) : (
-                  editedTemp
-                )}
-              </p>
-              <div className="text-gray-300">
-                {isEditing ? (
-                  <div>
-                    <label>Link:</label>
+                  ) : (
+                    localFilament.name
+                  )}
+                </h2>
+                <p className="text-gray-300">
+                  {localFilament.material} {localFilament.size}mm
+                </p>
+                <p className="text-gray-300">
+                  {isEditing ? (
                     <input
-                      type="text"
-                      value={editedLink}
-                      onChange={(e) => setEditedLink(e.target.value)}
-                      className="text-white bg-gray-800 border-gray-600 border-2 p-2 m-2 h-6 w-48 rounded"
+                      type="number"
+                      name="temp"
+                      value={editedTemp}
+                      onChange={(e) => setEditedTemp(e.target.value)}
+                      className="text-white bg-gray-800 border-gray-600 border-2 p-2  h-6 w-20 rounded"
                     />
-                  </div>
-                ) : (
-                  <a
-                    href={localFilament.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-500"
-                  >
-                    <FaExternalLinkAlt className="inline mr-1" />
-                    {localFilament.link ? "Link Available" : "No Link Provided"}
-                  </a>
-                )}
+                  ) : (
+                    <p>{editedTemp}°</p>
+                  )}
+                </p>
+
+                <div className="text-gray-300 ">
+                  {isEditing ? (
+                    <div>
+                      <label>Link:</label>
+                      <input
+                        type="text"
+                        name="link"
+                        value={editedLink}
+                        onChange={handleInputChange}
+                        className={`text-white bg-gray-800 border ${
+                          urlError ? "border-red-500" : "border-gray-600"
+                        } p-2 m-2 h-6 w-48 rounded`}
+                      />
+                      {urlError && (
+                        <p className="text-red-500 text-xs italic">
+                          {urlError}
+                        </p>
+                      )}
+                    </div>
+                  ) : localFilament.link ? (
+                    <a
+                      href={
+                        editedLink.startsWith("http://") ||
+                        editedLink.startsWith("https://")
+                          ? editedLink
+                          : `http://${editedLink}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 flex items-center w-fit"
+                    >
+                      <FaExternalLinkAlt className="inline mr-1" />
+                      Open Link
+                    </a>
+                  ) : (
+                    <span className="text-gray-500">No Link Provided</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                {/* CountUp for Current Amount */}
+                <CountUp
+                  start={0}
+                  end={Number(localFilament.currentAmount)} // Convert to a number
+                  duration={2} // Set the duration for the CountUp animation (in seconds)
+                  separator=","
+                  className="text-5xl md:text-8xl text-gray-200 font-extrabold ml-4"
+                  style={{
+                    fontFamily: "'Orbitron', sans-serif", // Use the Orbitron font
+                    letterSpacing: "2px", // Adjust letter spacing for a digital look
+                    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)", // Add a subtle shadow
+                  }}
+                />
+                <span className="mr-0 md:mr-4 text-2xl text-gray-500 ml-1">
+                  g
+                </span>
               </div>
             </div>
-            {/* CountUp for Current Amount */}
-            <CountUp
-              start={0}
-              end={localFilament.currentAmount}
-              duration={2}
-              separator=","
-              className="text-4xl text-gray-200 font-extrabold ml-4"
-            />
-            {/* Edit and Archive Buttons */}
-            <div className="ml-4 flex flex-col items-start">
+            <div className="w-full gap-4 md:gap-0 md:w-auto md:ml-4 flex flex-row md:flex-col justify-between md:items-start">
               <button
                 onClick={toggleEdit}
-                className="text-white py-2 px-4 rounded mb-2 flex items-center justify-center min-w-[140px] max-w-[140px] truncate overflow-hidden bg-blue-600 hover:bg-blue-700"
+                className="flex items-center justify-center text-white py-2 px-4 rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] bg-blue-600 hover:bg-blue-700"
               >
-                <FiEdit className="mr-2" />
+                <FiEdit className="mr-2 text-base" />{" "}
+                {/* Adjust text-base if needed */}
                 {isEditing ? "Cancel" : "Edit"}
               </button>
               <button
                 onClick={handleArchive}
-                className={`text-white py-2 px-4 rounded flex items-center justify-center min-w-[140px] max-w-[140px] truncate overflow-hidden ${
+                className={`flex items-center justify-center text-white py-2 px-4 h-12 rounded my-4 md:mb-2 flex-grow md:flex-grow-0 md:min-w-[140px] ${
                   isArchived
                     ? "bg-red-500 hover:bg-red-600"
                     : "bg-green-500 hover:bg-green-600"
                 }`}
               >
-                <MdArchive className="mr-2" />
+                <MdArchive className="mr-2 text-base" />{" "}
+                {/* Adjust text-base if needed */}
                 {isArchived ? "Unarchive" : "Archive"}
               </button>
-              {/* Save Button */}
-              {isEditing && (
-                <button
-                  onClick={handleSave}
-                  className="text-white py-2 px-4 rounded mt-2 flex items-center justify-center min-w-[140px] max-w-[140px] truncate overflow-hidden bg-orange-600 hover:bg-orange-700"
-                >
-                  Save
-                </button>
-              )}
             </div>
           </div>
 
@@ -314,6 +362,27 @@ const SingleFilament = () => {
                 </button>
               )}
               <br />
+              {isEditing && (
+                <div className="p-4  ">
+                  <label className="block text-lg font-medium text-white mb-2">
+                    Update Color
+                  </label>
+                  <ChromePicker
+                    color={editedColor}
+                    onChangeComplete={handleColorChange}
+                  />
+                </div>
+              )}
+
+              {/* Conditionally rendered Save Button */}
+              {isEditing && (
+                <button
+                  onClick={handleSave}
+                  className="text-white py-2 px-4 rounded mt-2 md:mt-2 flex-grow md:flex-grow-0 md:min-w-[140px] bg-orange-600 hover:bg-orange-700"
+                >
+                  Save Changes
+                </button>
+              )}
               {/* Conditionally render the "Delete" button */}
               {isArchived && (
                 <button
