@@ -5,9 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi"; // Importing right arrow icon
 import { IoIosSettings } from "react-icons/io"; // Importing settings icon
 import { Tooltip } from "react-tooltip"; // Importing tooltip component
+import { toggleDarkMode } from "../../slices/themeSlice";
+import { useDispatch } from "react-redux";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Correctly using useDispatch here
+const darkMode = useSelector((state) => state.theme.darkMode);
 
   const handleTileClick = (page) => {
     if (page === "filament") {
@@ -17,8 +23,12 @@ const Dashboard = () => {
     }
   };
 
+  const handleToggle = () => {
+    dispatch(toggleDarkMode());
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-200 pb-20">
+    <div className="flex flex-col min-h-screen bg-gray-200 dark:bg-gray-900 pb-20">
       {/* Top Bar */}
       <div className="flex flex-col items-center w-full px-4 py-2 top-0 z-10">
         <img
@@ -80,9 +90,17 @@ const Dashboard = () => {
         >
           <IoIosSettings className="text-white" size={28} />
         </button>
-
+        <button
+          onClick={handleToggle}
+          className="flex items-center justify-center"
+          data-tip={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {darkMode ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
+          <span className="ml-2">Toggle Dark Mode</span>
+        </button>
         {/* Tooltip components */}
         <Tooltip id="settings-tooltip" place="right" effect="solid" />
+        <Tooltip place="right" type="dark" effect="solid" />
       </div>
     </div>
   );

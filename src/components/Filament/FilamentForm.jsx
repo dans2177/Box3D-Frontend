@@ -127,7 +127,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
           {/* Adjust this max height as needed */}
           <div className="flex items-top justify-between pb-4">
             <h2 className="text-2xl pb-4 text-gray-200 font-semibold">
-              Add Filament
+              Add Spool
             </h2>
             <button
               onClick={onClose}
@@ -228,8 +228,11 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
             {/* Starting Amount Field */}
             <div className="mb-4">
-              <label className="block text-gray-200 text-sm font-bold mb-2">
-                Starting Amount:
+              <label className=" text-gray-200 text-sm font-bold mb-4">
+                Starting Amount:{" "}
+              </label>
+              <label className=" text-gray-200 text-sm ">
+                (This can not be changed.)
               </label>
               <Select
                 options={startingAmountOptions}

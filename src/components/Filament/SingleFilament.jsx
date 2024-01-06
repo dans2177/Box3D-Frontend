@@ -18,6 +18,8 @@ import LoadingComponent from "../Others/Loading";
 import SubtractionFilament from "./SubtractFilament";
 import Overlay from "../../assets/Overlay.png";
 import CountUp from "react-countup";
+import { GrSubtractCircle } from "react-icons/gr";
+
 
 // ----------------------------------------------------------------
 // Logic
@@ -30,8 +32,6 @@ const SingleFilament = () => {
   const reduxFilament = useSelector((state) =>
     state.filament.items.find((item) => item._id === filamentId)
   );
-
-  // Local state to mirror filament data from Redux
   const [localFilament, setLocalFilament] = useState(reduxFilament || {});
 
   useEffect(() => {
@@ -119,7 +119,6 @@ const SingleFilament = () => {
       if (value.length <= 5) {
         setEditedName(value);
       }
-      // Optionally, you can add an else block to notify the user that the max length has been reached
     }
   };
 
@@ -148,15 +147,10 @@ const SingleFilament = () => {
         isArchived: isArchived,
         color: editedColor || localFilament.color,
       };
-
-      console.log("Updating filament with data:", updateData); // Debugging log
-      console.log("Saving with temperature:", editedTemp); // Debug log
-
       const token = await getToken();
       const updateResult = await dispatch(
         updateFilament({ filamentData: updateData, token })
       );
-      console.log("Update result:", updateResult); // Debugging log
 
       if (updateResult.error) {
         throw new Error("Error in dispatching updateFilament");
@@ -167,7 +161,6 @@ const SingleFilament = () => {
       setIsEditing(false);
     } catch (error) {
       toast.error("Error updating filament.");
-      console.error("Error updating filament:", error);
     }
   };
 
@@ -190,12 +183,13 @@ const SingleFilament = () => {
       <div className="p-4 mx-auto max-w-4xl bg-gray-800 min-h-screen">
         <div className="mb-4">
           <div className="flex justify-between items-center mb-4">
-            <button
+            <div
+              className="inline-flex justify-center items-center rounded-full transition-all p-1 hover:bg-green-900"
               onClick={handleBackClick}
-              className="text-green-200 text-lg"
+              style={{ margin: "0 10px" }}
             >
-              <FaArrowLeft className="inline mr-2" />
-            </button>
+              <FaArrowLeft size={24} className="text-gray-100" />
+            </div>
             <h1 className="text-2xl font-bold text-center"></h1>
             <div></div>
           </div>
@@ -217,7 +211,7 @@ const SingleFilament = () => {
               </div>
               {/* Filament Info */}
               <div className="ml-4 flex-grow">
-                <h2 className="text-4xl pb-4 font-bold text-gray-200">
+                <h2 className="text-4xl pb-4 font-bold text-gray-200 truncate">
                   {isEditing ? (
                     <input
                       type="text"
@@ -233,7 +227,7 @@ const SingleFilament = () => {
                 <p className="text-gray-300">
                   {localFilament.material} {localFilament.size}mm
                 </p>
-                <p className="text-gray-300">
+                <div className="text-gray-300">
                   {isEditing ? (
                     <input
                       type="number"
@@ -245,7 +239,7 @@ const SingleFilament = () => {
                   ) : (
                     <p>{editedTemp}°</p>
                   )}
-                </p>
+                </div>
 
                 <div className="text-gray-300 ">
                   {isEditing ? (
@@ -409,11 +403,13 @@ const SingleFilament = () => {
                 <h3 className="text-xl font-bold text-gray-200 mt-4 mb-2">
                   Subtractions
                 </h3>
-                <SubtractionFilament
-                  filamentId={filamentId}
-                  filamentName={localFilament.name}
-                  currentAmount={localFilament.currentAmount}
-                />
+                {localFilament.name && localFilament.currentAmount && (
+                  <SubtractionFilament
+                    filamentId={filamentId}
+                    filamentName={localFilament.name}
+                    currentAmount={localFilament.currentAmount}
+                  />
+                )}
               </div>
               {localFilament.subtractions &&
                 localFilament.subtractions.map(
@@ -422,22 +418,26 @@ const SingleFilament = () => {
                   ) => (
                     <div
                       key={subtraction._id}
-                      className="mb-2 border p-2 rounded flex items-center justify-between text-gray-300 bg-red-900"
+                      className="mb-2 m-auto p-auto border pl-4 md:pl-6 text-xl md:text-2xl p-2 rounded flex items-center justify-between text-gray-300 bg-red-900"
                     >
-                      <div>
-                        <span className="font-semibold">Length:</span>
+                      <div className="flex-grow flex items-center font-bold">
+                        <GrSubtractCircle className="mr-2" />
                         {subtraction.subtractionLength}g
                       </div>
-                      <div>
-                        <span className="font-semibold">Date:</span>
-                        {new Date(subtraction.date).toLocaleDateString()}
+
+                      <div className="flex items-center">
+                        <div className="mr-4">
+                          {new Date(subtraction.date).toLocaleDateString()}
+                        </div>
+                        <button
+                          onClick={() =>
+                            handleDeleteSubtraction(subtraction._id)
+                          }
+                          className="bg-red-600 hover:bg-red-800 text-white py-1 px-2 rounded"
+                        >
+                          <FiTrash />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleDeleteSubtraction(subtraction._id)}
-                        className="bg-red-600 hover:bg-red-800 text-white py-1 px-2 rounded"
-                      >
-                        <FiTrash />
-                      </button>
                     </div>
                   )
                 )}

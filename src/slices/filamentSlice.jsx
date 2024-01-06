@@ -14,21 +14,6 @@ export const fetchFilaments = createAsyncThunk(
   }
 );
 
-// Function to fetch a single filament by ID
-const fetchSingleFilament = async (filamentId, token) => {
-  const response = await fetch(`/api/filaments/${filamentId}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch filament: ${response.status}`);
-  }
-
-  return response.json();
-};
 
 // Update User Filament
 export const updateFilament = createAsyncThunk(
@@ -108,26 +93,44 @@ export const deleteFilament = createAsyncThunk(
   }
 );
 
-// Get Single Filament
 export const getSingleFilament = createAsyncThunk(
   "filament/getSingleFilament",
-  async ({ filamentId, token }, { getState, dispatch }) => {
+  async ({ filamentId, token }, { getState, rejectWithValue }) => {
     const state = getState();
     const existingFilament = state.filament.items.find(
       (f) => f._id === filamentId
     );
 
-    // If filament is already in the state, return it
+    // Return existing filament if found in state
     if (existingFilament) {
       return existingFilament;
     }
 
-    // If not found, fetch the specific filament by ID
+    // Fetch the specific filament by ID if not in state
     try {
-      const response = await fetchSingleFilament(filamentId, token);
-      return response.data; // Assuming your API response has a "data" property
+      const response = await fetch(
+        `http://localhost:3000/filaments/${filamentId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Check if the response is valid
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch filament: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      return data; // Assuming the response data is the filament object
     } catch (error) {
-      throw new Error("Error fetching filament: " + error.message);
+      // Use rejectWithValue to handle errors in createAsyncThunk
+      return rejectWithValue(error.message || "Error fetching filament");
     }
   }
 );
@@ -265,14 +268,13 @@ const filamentSlice = createSlice({
         );
 
         if (existingFilamentIndex !== -1) {
-          // Replace the existing filament
+          // Replace the existing filament in the state
           state.items[existingFilamentIndex] = updatedFilament;
         } else {
-          // Filament doesn't exist, push it
+          // Filament doesn't exist in the state, push it
           state.items.push(updatedFilament);
         }
       })
-
       .addCase(createSubtraction.fulfilled, (state, action) => {
         const { filamentId, newSubtraction } = action.payload;
         const index = state.items.findIndex((f) => f._id === filamentId);

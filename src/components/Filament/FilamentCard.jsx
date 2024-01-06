@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { GrView } from "react-icons/gr";
@@ -8,26 +8,6 @@ import CountUp from "react-countup";
 
 const FilamentCard = ({ filament }) => {
   const titleRef = useRef(null);
-
-  useEffect(() => {
-    adjustTitleFontSize();
-  }, [filament.name]);
-
-  const adjustTitleFontSize = () => {
-    const titleElement = titleRef.current;
-    if (!titleElement) return;
-
-    let fontSize = 32; // Initial font size in pixels
-    const maxWidth = titleElement.parentElement.offsetWidth; // Maximum width available
-
-    titleElement.style.fontSize = ""; // Reset font size
-
-    while (titleElement.scrollWidth > maxWidth && fontSize > 12) {
-      fontSize -= 1;
-      titleElement.style.fontSize = `${fontSize}px`;
-    }
-  };
-
   const hasSubtractions = filament.currentAmount < filament.startingAmount;
   const remainingPercentage = hasSubtractions
     ? (filament.currentAmount / filament.startingAmount) * 100
@@ -48,13 +28,17 @@ const FilamentCard = ({ filament }) => {
         </div>
         <div className="text-right flex-1 min-w-0">
           <h3
-            className="text-gray-200 text-lg md:text-xl lg:text-2xl font-semibold truncate"
+            className="text-gray-200 pb-2 text-4xl  font-semibold truncate"
             ref={titleRef}
+            style={{ fontFamily: "Montserrat, sans-serif" }} // Adds a modern, clean font for the title
           >
             {filament.name}
           </h3>
-          <p className="text-sm text-gray-300">
-            Temp: {filament.temperature}°C
+          <p
+            className="text-md text-red-300"
+            style={{ fontFamily: "Roboto, sans-serif" }} // Adds a readable, simple font for the temperature
+          >
+            {filament.temperature}°C
           </p>
         </div>
       </div>
@@ -64,17 +48,29 @@ const FilamentCard = ({ filament }) => {
           end={filament.currentAmount}
           duration={1}
           separator=","
-          className="text-4xl text-gray-200 font-extrabold ml-4"
+          className="text-4xl text-gray-200 font-extrabold"
           style={{
             fontFamily: "'Orbitron', sans-serif", // Use the Orbitron font
             letterSpacing: "2px", // Adjust letter spacing for a digital look
             textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)", // Add a subtle shadow
           }}
-        >
-          
-        </CountUp>
+        ></CountUp>
+        <span className="text-lg text-gray-500 self-end mb-1 ml-1">g</span>
       </div>
-      <div className="flex justify-between text-sm mt-1 mb-2">
+
+      <div className="w-full bg-red-200 rounded-full h-4 overflow-hidden">
+        {hasSubtractions ? (
+          <div
+            style={{ width: `${remainingPercentage}%` }}
+            className="bg-green-500 h-full rounded-full "
+          ></div>
+        ) : (
+          <div className="bg-green-500 h-full rounded-full text-center text-xs text-white">
+            No subtractions made yet.
+          </div>
+        )}
+      </div>
+      <div className="flex justify-between text-sm mx-4 my-4">
         <SubtractionFilament
           filamentId={filament._id}
           filamentName={filament.name}
@@ -82,23 +78,11 @@ const FilamentCard = ({ filament }) => {
         />
         <Link
           to={`/filament/${filament._id}`}
-          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded w-1/2 ml-1 flex items-center justify-center "
+          className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded w-1/2 flex items-center justify-center ml-4"
         >
           <GrView className="text-2xl mr-1" />
           <span className="text-xs">View</span>
         </Link>
-      </div>
-      <div className="w-full bg-red-200 rounded-full h-4 overflow-hidden">
-        {hasSubtractions ? (
-          <div
-            style={{ width: `${remainingPercentage}%` }}
-            className="bg-green-500 h-full rounded-full"
-          ></div>
-        ) : (
-          <div className="bg-green-500 h-full rounded-full text-center text-xs text-white">
-            No subtractions made yet.
-          </div>
-        )}
       </div>
     </div>
   );

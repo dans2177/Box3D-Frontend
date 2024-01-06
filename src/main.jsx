@@ -21,6 +21,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     redirectUri="http://localhost:5173/"
     audience="https://thebox3d.com"
     onRedirectCallback={onRedirectCallback}
+    //DO NOT USE BELOW IN PRODUCTION SET CUSTOM DOMAIN!!!!
+    isDangerouslyUseLocalStorage={true}
   >
     <Provider store={store}>
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
