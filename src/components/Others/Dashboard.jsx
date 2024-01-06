@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch(); // Correctly using useDispatch here
-const darkMode = useSelector((state) => state.theme.darkMode);
+  const darkMode = useSelector((state) => state.theme.darkMode);
 
   const handleTileClick = (page) => {
     if (page === "filament") {
@@ -28,22 +28,24 @@ const darkMode = useSelector((state) => state.theme.darkMode);
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-200 dark:bg-gray-900 pb-20">
+    <div className="flex flex-col min-h-screen bg-gray-200 dark:bg-gray-700 pb-20">
       {/* Top Bar */}
-      <div className="flex flex-col items-center w-full px-4 py-2 top-0 z-10">
+      <div className="flex flex-col items-center w-full px-4 py-2 pt-4">
         <img
           className="h-16 md:h-24"
           src={DashboardLogo}
           alt="3D Logbook Logo"
         />
-        <h1 className="text-xl md:text-3xl p-2 font-sans">3D Logbook</h1>
+        <h1 className="text-xl font-orbitron text-gray-800 dark:text-gray-200 md:text-3xl p-2">
+          3D Logbook
+        </h1>
       </div>
 
       {/* Content */}
       <div className="flex-grow flex items-center justify-center ">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
           {/* Projects Tile */}
-          <div className="bg-gray-800 rounded-lg shadow-md hover:bg-gray-900 cursor-pointer relative">
+          <div className="bg-violet-100 dark:bg-blue-700 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative">
             <img
               src={projectsImage}
               alt="Projects"
@@ -53,17 +55,17 @@ const darkMode = useSelector((state) => state.theme.darkMode);
               onClick={() => handleTileClick("projects")}
               className="p-2 flex justify-between items-center"
             >
-              <h2 className="text-lg text-blue-200 md:text-xl font-sans pt-8">
-                Projects
+              <h2 className="text-lg font-bold font-orbitron text-blue-700 dark:text-gray-200 md:text-xl tracking-widest pt-8">
+                PROJECTS
               </h2>
-              <FiArrowRight className="text-2xl text-blue-200 absolute bottom-0 right-0 mb-2 mr-2" />
+              <FiArrowRight className="text-2xl text-blue-700 dark:text-gray-200 absolute bottom-0 right-0 mb-2 mr-2" />
             </div>
           </div>
 
           {/* Filaments Tile */}
           <div
             onClick={() => handleTileClick("filament")}
-            className="bg-gray-800 rounded-lg shadow-md hover:bg-gray-900 cursor-pointer relative"
+            className="bg-lime-100 dark:bg-lime-800 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative"
           >
             <img
               src={filamentsImage}
@@ -71,12 +73,12 @@ const darkMode = useSelector((state) => state.theme.darkMode);
               className="w-full h-48 md:h-64 object-cover rounded-t-lg"
             />
             <div className="p-2 flex justify-between items-center">
-              <h2 className="text-lg text-green-200 md:text-xl font-sans pt-8">
-                Filaments
+              <h2 className="text-lg font-bold font-orbitron text-green-700 dark:text-gray-200 md:text-xl tracking-widest pt-8">
+                FILAMENTS
               </h2>
             </div>
             {/* Positioned arrow icon at the bottom right */}
-            <FiArrowRight className="text-2xl text-green-200 absolute bottom-0 right-0 mb-2 mr-2" />
+            <FiArrowRight className="text-2xl text-green-600 dark:text-gray-200 absolute bottom-0 right-0 mb-2 mr-2" />
           </div>
         </div>
       </div>
@@ -92,15 +94,22 @@ const darkMode = useSelector((state) => state.theme.darkMode);
         </button>
         <button
           onClick={handleToggle}
-          className="flex items-center justify-center"
-          data-tip={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className={`flex items-center rounded-full justify-center p-2 transition duration-500 ease-in-out ${
+            darkMode
+              ? "bg-blue-600 text-yellow-400"
+              : "bg-purple-500 text-yellow-400"
+          }`}
+          data-tooltip-id="darkmode-tooltip" // Add tooltip id
+          data-tooltip-content={
+            darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"
+          } // Add tooltip content
         >
-          {darkMode ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
-          <span className="ml-2">Toggle Dark Mode</span>
+          {darkMode ? <MdLightMode size={28} /> : <MdDarkMode size={28} />}
         </button>
+
         {/* Tooltip components */}
         <Tooltip id="settings-tooltip" place="right" effect="solid" />
-        <Tooltip place="right" type="dark" effect="solid" />
+        <Tooltip id="darkmode-tooltip" place="right" effect="solid" />
       </div>
     </div>
   );

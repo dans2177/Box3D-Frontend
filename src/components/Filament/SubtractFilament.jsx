@@ -57,7 +57,7 @@ const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
     <>
       <button
         onClick={openModal}
-        className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded w-1/2 flex items-center justify-center "
+        className="text-red-800 border-2 border-red-700 hover:bg-red-800 dark:border-none hover:text-white dark:bg-red-500 dark:hover:bg-red-700 dark:text-white font-bold py-1 px-3 rounded w-1/2 flex items-center justify-center"
       >
         <GrSubtractCircle className="text-2xl mr-1" />
         <span className="text-xs">Quick Subtract</span>
@@ -66,14 +66,14 @@ const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Subtract Filament"
-        className="Modal inline-block  overflow-hidden text-left align-middle transition-all transform bg-gray-800  rounded-lg shadow-2"
+        className="Modal inline-block  overflow-hidden text-left align-middle transition-all transform bg-gray-200 dark:bg-gray-800  rounded-lg shadow-2"
         overlayClassName="Overlay fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
       >
-        <div className="p-6 max-w-sm mx-auto bg-gray-800  rounded-lg ">
-          <h2 className="text-lg font-bold mb-4 text-gray-200 font-sans">
+        <div className="p-6 max-w-sm mx-auto   rounded-lg ">
+          <h2 className="text-lg font-bold mb-4 dark:text-gray-200 font-sans">
             Quick Subtract
           </h2>
-          <h4 className="text-sm font-semibold mb-4 text-gray-400 font-mono">
+          <h4 className="text-sm font-semibold mb-4 dark:text-gray-400 font-mono">
             from {filamentName}
           </h4>
           <input
@@ -81,18 +81,18 @@ const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
             value={subtractionAmount}
             onChange={(e) => setSubtractionAmount(e.target.value)}
             placeholder="Amount to subtract"
-            className="border border-gray-300 p-2 rounded w-full mb-4"
+            className="border dark:border-gray-300 p-2 rounded w-full mb-4"
           />
           <div className="flex justify-between space-x-4">
             <button
               onClick={handleSubtraction}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center transition duration-200 w-1/2"
+              className="border-4 border-green-700 dark:border-none dark:bg-green-500 dark:hover:bg-green-700 text-green-700 hover:bg-green-700 hover:text-white dark:text-white font-bold py-2 px-4 rounded flex items-center justify-center transition duration-200 w-1/2"
             >
               <IoMdCheckmarkCircle className="mr-2" /> Confirm
             </button>
             <button
               onClick={closeModal}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center transition duration-200 w-1/2"
+              className="border-4 border-red-700 dark:border-none text-red-700  dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-700 dark:text-white hover:text-white font-bold py-2 px-4 rounded flex items-center justify-center transition duration-200 w-1/2"
             >
               <IoMdCloseCircle className="mr-2" /> Close
             </button>

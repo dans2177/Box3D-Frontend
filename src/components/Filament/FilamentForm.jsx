@@ -121,12 +121,12 @@ const FilamentForm = ({ isOpen, onClose }) => {
         isOpen={isOpen}
         onRequestClose={onClose}
         contentLabel="Add Filament"
-        className="max-w-2xl mx-auto bg-gray-700 text-white rounded-lg p-6 border-gray-400 border-2 m-4 shadow-lg overflow-auto"
+        className="max-w-2xl mx-auto bg-gray-200  dark:bg-gray-700 dark:text-gray-200 rounded-lg p-6 border-gray-400 border-2 m-4 shadow-lg overflow-auto"
       >
         <div className="max-h-[80vh] ">
           {/* Adjust this max height as needed */}
           <div className="flex items-top justify-between pb-4">
-            <h2 className="text-2xl pb-4 text-gray-200 font-semibold">
+            <h2 className="text-2xl pb-4 dark:text-gray-200 font-semibold">
               Add Spool
             </h2>
             <button
@@ -140,11 +140,11 @@ const FilamentForm = ({ isOpen, onClose }) => {
           <form className="space-y-4">
             {/* ID Field */}
             <div className="mb-4">
-              <label className="block text-gray-200 text-sm font-bold mb-2">
+              <label className="block text-sm font-bold mb-2">
                 ID (Max 5 chars):
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
                 type="text"
                 name="name"
                 placeholder="Enter ID (Max 5)"
@@ -156,7 +156,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
             {/* Link Field */}
             <div className="mb-4">
-              <label className="block text-gray-200 text-sm font-bold mb-2">
+              <label className="block  text-sm font-bold mb-2">
                 Link:
               </label>
               <input
@@ -172,7 +172,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
             {/* Material Field */}
             <div className="mb-4">
-              <label className="block text-gray-200 text-sm font-bold mb-2">
+              <label className="block text-sm font-bold mb-2">
                 Material:
               </label>
               <Select
@@ -197,7 +197,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
             {/* Size Field */}
             <div className="mb-4">
-              <label className="block text-gray-200 text-sm font-bold mb-2">
+              <label className="block  text-sm font-bold mb-2">
                 Size:
               </label>
               <Select
@@ -213,7 +213,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
             {/* Temperature Field */}
             <div className="mb-4">
-              <label className="block text-gray-200 text-sm font-bold mb-2">
+              <label className="block  text-sm font-bold mb-2">
                 Temp:
               </label>
               <input
@@ -228,10 +228,10 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
             {/* Starting Amount Field */}
             <div className="mb-4">
-              <label className=" text-gray-200 text-sm font-bold mb-4">
+              <label className="  text-sm font-bold mb-4">
                 Starting Amount:{" "}
               </label>
-              <label className=" text-gray-200 text-sm ">
+              <label className="  text-sm ">
                 (This can not be changed.)
               </label>
               <Select
@@ -257,7 +257,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
             {/* Color Picker Field */}
             <div className="mb-4">
-              <label className="block text-gray-200 text-sm font-bold mb-2">
+              <label className="block  text-sm font-bold mb-2">
                 Color:
               </label>
               <SliderPicker
@@ -272,7 +272,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
 
               <button
                 onClick={handleSave}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 mb-20 px-4 rounded"
+                className=" mt-4 border-4 dark:border-none text-blue-600 dark:text-gray-200 border-blue-700 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-700 hover:text-white font-bold py-2 mb-20 px-4 rounded"
               >
                 Save Filament
               </button>

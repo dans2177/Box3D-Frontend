@@ -73,7 +73,7 @@ const InventoryView = () => {
   }
 
   return (
-    <div className="p-4 bg-gray-700 min-h-screen relative pb-20">
+    <div className="p-4 bg-gray-200 dark:bg-gray-700 min-h-screen relative pb-20">
       <div className="flex justify-between items-center mb-4 px-4">
         <div className="flex items-center">
           <div
@@ -81,9 +81,12 @@ const InventoryView = () => {
             onClick={handleBackClick}
             style={{ margin: "0 10px" }}
           >
-            <IoIosArrowBack size={24} className="text-gray-100" />
+            <IoIosArrowBack
+              size={24}
+              className="text-gray-900 dark:text-gray-200"
+            />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-100">
+          <h2 className="text-2xl font-semibold text-gray-800  dark:text-gray-100">
             Filament Inventory
           </h2>
         </div>
@@ -101,18 +104,18 @@ const InventoryView = () => {
 
       {/* Command Center */}
       <div
-        className={`fixed bottom-0 left-0 m-4 bg-gray-800 rounded-lg p-2 flex flex-col items-center ${
+        className={`fixed bottom-0 left-0 m-4 bg-cyan-50  dark:bg-gray-800 rounded-lg p-2 flex flex-col items-center ${
           isOpen ? "space-y-2" : ""
         }`}
       >
         <button
           onClick={toggleCommandCenter}
-          className="bg-orange-600 hover:bg-orange-700 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
+          className="text-amber-500 border-4 border-amber-500 dark:bg-amber-600 hover:text-white dark:text-white dark:border-none hover:bg-amber-500 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
         >
           {isOpen ? (
-            <IoIosArrowDown className="text-white" size={28} />
+            <IoIosArrowDown size={28} />
           ) : (
-            <IoIosArrowUp className="text-white" size={28} />
+            <IoIosArrowUp  size={28} />
           )}
         </button>
         {isOpen && (
@@ -121,7 +124,7 @@ const InventoryView = () => {
               onClick={() => setShowFilamentForm(true)}
               data-tooltip-id="add-button-tooltip"
               data-tooltip-content="Add Item"
-              className="bg-green-500 text-white hover:bg-green-600 rounded-full p-2 inline-flex items-center justify-center transition duration-200"
+              className="border-4 border-green-600  dark:text-white dark:border-none text-green-600 hover:text-white dark:bg-green-500 darkLtext-white hover:bg-green-600 rounded-full p-2 inline-flex items-center justify-center transition duration-200"
             >
               <IoIosAdd size={28} />
             </button>
@@ -133,17 +136,17 @@ const InventoryView = () => {
               }
               onClick={toggleArchived}
               className={`${
-                showArchived ? "bg-red-900" : "bg-red-600"
-              } hover:bg-orange-800 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full`}
+                showArchived ? "dark:bg-red-900" : "dark:bg-red-600"
+              } hover:bg-red-600 border-4 dark:border-none text-red-600 border-red-600 hover:text-white rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full`}
             >
-              <IoIosArchive className="text-white" size={28} />
+              <IoIosArchive className=" dark:text-white" size={28} />
             </button>
             <button
               data-tooltip-id="settings-tooltip"
               data-tooltip-content="Settings"
-              className="bg-blue-600 hover:bg-blue-700 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
+              className="text-blue-700 hover:bg-blue-600 dark:text-white hover:text-white border-4 border-blue-600 dark:border-none dark:bg-blue-600 dark:hover:bg-blue-700 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
             >
-              <IoIosSettings className="text-white" size={28} />
+              <IoIosSettings size={28} />
             </button>
 
             {/* Tooltip components */}

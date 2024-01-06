@@ -19,7 +19,7 @@ import SubtractionFilament from "./SubtractFilament";
 import Overlay from "../../assets/Overlay.png";
 import CountUp from "react-countup";
 import { GrSubtractCircle } from "react-icons/gr";
-
+import { MdAutorenew } from "react-icons/md";
 
 // ----------------------------------------------------------------
 // Logic
@@ -159,6 +159,7 @@ const SingleFilament = () => {
       setLocalFilament(updateData);
       toast.success("Filament updated successfully!");
       setIsEditing(false);
+      setNoteEdited(false);
     } catch (error) {
       toast.error("Error updating filament.");
     }
@@ -179,8 +180,8 @@ const SingleFilament = () => {
   }
 
   return (
-    <div className="bg-gray-700 min-h-screen">
-      <div className="p-4 mx-auto max-w-4xl bg-gray-800 min-h-screen">
+    <div className="bg-gray-300 dark:bg-gray-700 min-h-screen">
+      <div className="bg-gray-200 p-4 mx-auto max-w-4xl dark:bg-gray-800 min-h-screen">
         <div className="mb-4">
           <div className="flex justify-between items-center mb-4">
             <div
@@ -188,7 +189,10 @@ const SingleFilament = () => {
               onClick={handleBackClick}
               style={{ margin: "0 10px" }}
             >
-              <FaArrowLeft size={24} className="text-gray-100" />
+              <FaArrowLeft
+                size={24}
+                className="text-gray-900 dark:text-gray-100"
+              />
             </div>
             <h1 className="text-2xl font-bold text-center"></h1>
             <div></div>
@@ -211,37 +215,37 @@ const SingleFilament = () => {
               </div>
               {/* Filament Info */}
               <div className="ml-4 flex-grow">
-                <h2 className="text-4xl pb-4 font-bold text-gray-200 truncate">
+                <h2 className="text-4xl pb-4 font-bold text-gray-800 dark:text-gray-200 truncate">
                   {isEditing ? (
                     <input
                       type="text"
                       name="name" // Important: This should match the handleInputChange logic
                       value={editedName}
                       onChange={handleInputChange}
-                      className="text-white bg-gray-800 border-gray-600 border-2 p-2 h-10 w-40 rounded"
+                      className="dark:text-white dark:bg-gray-800 border-gray-600 border-2 p-2 h-10 w-40 rounded"
                     />
                   ) : (
                     localFilament.name
                   )}
                 </h2>
-                <p className="text-gray-300">
+                <p className="text-bold text-gray-900 dark:text-gray-300">
                   {localFilament.material} {localFilament.size}mm
                 </p>
-                <div className="text-gray-300">
+                <div className="text-gray-900 dark:text-gray-300">
                   {isEditing ? (
                     <input
                       type="number"
                       name="temp"
                       value={editedTemp}
                       onChange={(e) => setEditedTemp(e.target.value)}
-                      className="text-white bg-gray-800 border-gray-600 border-2 p-2  h-6 w-20 rounded"
+                      className="dark:text-white dark:bg-gray-800 border-gray-600 border-2 p-2  h-6 w-20 rounded"
                     />
                   ) : (
                     <p>{editedTemp}°</p>
                   )}
                 </div>
 
-                <div className="text-gray-300 ">
+                <div className="text-gray-900 dark:text-gray-300 ">
                   {isEditing ? (
                     <div>
                       <label>Link:</label>
@@ -250,7 +254,7 @@ const SingleFilament = () => {
                         name="link"
                         value={editedLink}
                         onChange={handleInputChange}
-                        className={`text-white bg-gray-800 border ${
+                        className={`dark:text-white dark:bg-gray-800 border ${
                           urlError ? "border-red-500" : "border-gray-600"
                         } p-2 m-2 h-6 w-48 rounded`}
                       />
@@ -287,12 +291,7 @@ const SingleFilament = () => {
                   end={Number(localFilament.currentAmount)} // Convert to a number
                   duration={2} // Set the duration for the CountUp animation (in seconds)
                   separator=","
-                  className="text-5xl md:text-8xl text-gray-200 font-extrabold ml-4"
-                  style={{
-                    fontFamily: "'Orbitron', sans-serif", // Use the Orbitron font
-                    letterSpacing: "2px", // Adjust letter spacing for a digital look
-                    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)", // Add a subtle shadow
-                  }}
+                  className="text-8xl md:text-10xl text-gray-800 dark:text-gray-200 font-extrabold ml-4 font-orbitron tracking-wide"
                 />
                 <span className="mr-0 md:mr-4 text-2xl text-gray-500 ml-1">
                   g
@@ -302,7 +301,7 @@ const SingleFilament = () => {
             <div className="w-full gap-4 md:gap-0 md:w-auto md:ml-4 flex flex-row md:flex-col justify-between md:items-start">
               <button
                 onClick={toggleEdit}
-                className="flex items-center justify-center text-white py-2 px-4 rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] bg-blue-600 hover:bg-blue-700"
+                className="flex items-center justify-center text-blue-600 hover:text-white dark:text-white py-2 px-4 rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] dark:bg-blue-600 dark:hover:bg-blue-800 border-4 border-blue-600 dark:border-none hover:bg-blue-600"
               >
                 <FiEdit className="mr-2 text-base" />{" "}
                 {/* Adjust text-base if needed */}
@@ -310,10 +309,10 @@ const SingleFilament = () => {
               </button>
               <button
                 onClick={handleArchive}
-                className={`flex items-center justify-center text-white py-2 px-4 h-12 rounded my-4 md:mb-2 flex-grow md:flex-grow-0 md:min-w-[140px] ${
+                className={`flex items-center justify-center border-4 dark:border-none hover:text-white dark:text-white py-2 px-4 h-12 rounded my-4 md:mb-2 flex-grow md:flex-grow-0 md:min-w-[140px] ${
                   isArchived
-                    ? "bg-red-500 hover:bg-red-600"
-                    : "bg-green-500 hover:bg-green-600"
+                    ? "dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-700 border-red-600 text-red-500"
+                    : "dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-700 border-green-600 text-green-600"
                 }`}
               >
                 <MdArchive className="mr-2 text-base" />{" "}
@@ -324,41 +323,41 @@ const SingleFilament = () => {
           </div>
 
           {/* Remaining Percentage Bar */}
-          <div className="bg-gray-200 rounded-full h-2.5 mb-4">
+          <div className="bg-red-400 rounded-full h-6 m-4 mt-8 border-2 border-gray-900">
             <div
               style={{ width: `${remainingPercentage}%` }}
-              className="bg-green-500 h-full rounded-full"
+              className="bg-green-500 h-full rounded-full  "
             ></div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="order-2 md:order-1">
-              <h3 className="text-xl font-bold mt-4 mb-2 text-gray-200">
+              <h3 className="text-xl font-bold mt-4 mb-2 text-gray-800 dark:text-gray-200">
                 Notes
               </h3>
               <textarea
                 name="notes"
                 value={editedNote}
                 onChange={handleInputChange}
-                className="w-full h-32 p-2 border rounded mt-2 bg-slate-800 text-gray-200"
+                className="w-full h-32 p-2 border rounded mt-2 text-gray-900 dark:bg-slate-800 dark:text-gray-200"
               />
               {/* Update Notes Button */}
               {noteEdited && (
                 <button
                   onClick={handleSave}
-                  className={` text-white py-2 px-4 rounded mt-2 mr-2 ${
+                  className={`flex items-center justify-center text-purple-600 border-4 border-purple-600 dark:border-none hover:text-white dark:text-white py-2 px-4 rounded mt-2 mr-2 ${
                     noteEdited
-                      ? "bg-purple-700 hover:bg-purple-800"
-                      : "bg-gray-600 "
+                      ? "dark:bg-purple-700 hover:bg-purple-600 dark:hover:bg-purple-900"
+                      : "bg-gray-600"
                   }`}
                 >
-                  Update Notes
+                  <MdAutorenew size={24} className="mr-2" /> Update Notes
                 </button>
               )}
               <br />
               {isEditing && (
                 <div className="p-4  ">
-                  <label className="block text-lg font-medium text-white mb-2">
+                  <label className="block text-lg font-medium dark:text-white mb-2">
                     Update Color
                   </label>
                   <ChromePicker
@@ -372,7 +371,7 @@ const SingleFilament = () => {
               {isEditing && (
                 <button
                   onClick={handleSave}
-                  className="text-white py-2 px-4 rounded mt-2 md:mt-2 flex-grow md:flex-grow-0 md:min-w-[140px] bg-orange-600 hover:bg-orange-700"
+                  className="text-orange-600 hover:text-white dark:text-white py-2 px-4 rounded mt-2 md:mt-2 flex-grow dark:border-none md:flex-grow-0 md:min-w-[140px] border-4 border-orange-600 dark:bg-orange-600 hover:bg-orange-600 hover:dark:bg-orange-900"
                 >
                   Save Changes
                 </button>
@@ -390,7 +389,7 @@ const SingleFilament = () => {
               )}
               {/* Style the message */}
               {isArchived && (
-                <p className="text-gray-300 mt-2">
+                <p className="dark:text-gray-300 mt-2">
                   Do not delete!
                   <br /> Keep archived instead, else tracking data will be lost
                   :(
@@ -418,9 +417,9 @@ const SingleFilament = () => {
                   ) => (
                     <div
                       key={subtraction._id}
-                      className="mb-2 m-auto p-auto border pl-4 md:pl-6 text-xl md:text-2xl p-2 rounded flex items-center justify-between text-gray-300 bg-red-900"
+                      className="border-4 border-gray-500 dark:border-none mx-4 bg-gray-300 mb-2 p-auto pl-4 md:pl-6 text-xl md:text-2xl p-2 rounded flex items-center justify-between dark:text-gray-300 dark:bg-red-900"
                     >
-                      <div className="flex-grow flex items-center font-bold">
+                      <div className="flex-grow text-red-500 dark:text-gray-200 text-bold flex items-center tracking-widest font-orbitron">
                         <GrSubtractCircle className="mr-2" />
                         {subtraction.subtractionLength}g
                       </div>
@@ -433,7 +432,7 @@ const SingleFilament = () => {
                           onClick={() =>
                             handleDeleteSubtraction(subtraction._id)
                           }
-                          className="bg-red-600 hover:bg-red-800 text-white py-1 px-2 rounded"
+                          className="border-4 rounded-full text-red-600 border-red-600 dark:border-none dark:bg-red-700 hover:bg-red-600 dark:hover:bg-red-500 hover:text-white dark:text-white py-1 px-2"
                         >
                           <FiTrash />
                         </button>
