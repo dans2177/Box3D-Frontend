@@ -3,7 +3,7 @@ import projectsImage from "../../assets/Projects.png";
 import filamentsImage from "../../assets/Filament.png";
 import { useNavigate } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi"; // Importing right arrow icon
-import { IoIosSettings } from "react-icons/io"; // Importing settings icon
+import { IoMdLogOut } from "react-icons/io"; // Importing settings icon
 import { Tooltip } from "react-tooltip"; // Importing tooltip component
 import { toggleDarkMode } from "../../slices/themeSlice";
 import { useDispatch } from "react-redux";
@@ -88,14 +88,6 @@ const Dashboard = () => {
       {/* Command Center*/}
       <div className="fixed bottom-0 left-0 m-4 rounded-lg p-2 flex flex-col items-center space-y-2">
         <button
-          onClick={() => logout()}
-          data-tooltip-id="settings-tooltip" // specify tooltip id
-          data-tooltip-content="Settings" // tooltip content
-          className="bg-blue-600 hover:bg-blue-700 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
-        >
-          <IoIosSettings className="text-white" size={28} />
-        </button>
-        <button
           onClick={handleToggle}
           className={`flex items-center rounded-full justify-center p-2 transition duration-500 ease-in-out ${
             darkMode
@@ -109,7 +101,14 @@ const Dashboard = () => {
         >
           {darkMode ? <MdLightMode size={28} /> : <MdDarkMode size={28} />}
         </button>
-
+        <button
+          onClick={() => logout()}
+          data-tooltip-id="settings-tooltip" // specify tooltip id
+          data-tooltip-content="Logout" // tooltip content
+          className="bg-blue-600 hover:bg-blue-700 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
+        >
+          <IoMdLogOut className="text-white" size={28} />
+        </button>
         {/* Tooltip components */}
         <Tooltip id="settings-tooltip" place="right" effect="solid" />
         <Tooltip id="darkmode-tooltip" place="right" effect="solid" />
