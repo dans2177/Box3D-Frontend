@@ -56,11 +56,11 @@ const FilamentCard = ({ filament }) => {
         </span>
       </div>
 
-      <div className="w-full bg-red-200 rounded-full h-4 overflow-hidden">
+      <div className="max-w-full bg-red-200 rounded-full h-4 overflow-hidden">
         {hasSubtractions ? (
           <div
             style={{ width: `${remainingPercentage}%` }}
-            className="bg-green-500 h-full rounded-full "
+            className="bg-green-500 h-full rounded-full overflow-hidden"
           ></div>
         ) : (
           <div className="bg-green-500 h-full rounded-full text-center text-xs text-white">
@@ -73,6 +73,7 @@ const FilamentCard = ({ filament }) => {
           filamentId={filament._id}
           filamentName={filament.name}
           currentAmount={filament.currentAmount}
+          className={` text-red-800 border-2 border-red-700 dark:border-none hover:bg-red-800 hover:text-white dark:bg-red-500 dark:hover:bg-red-700 dark:text-white font-bold py-1 px-3 rounded w-1/2 flex items-center justify-center ml-4`}
         />
         <Link
           to={`/filament/${filament._id}`}

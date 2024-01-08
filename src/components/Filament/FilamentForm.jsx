@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { SliderPicker } from "react-color";
-import { addFilament } from "../../slices/filamentSlice";
+import { addFilament, fetchFilaments } from "../../slices/filamentSlice";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -106,6 +106,7 @@ const FilamentForm = ({ isOpen, onClose }) => {
       if (result.type.includes("fulfilled")) {
         toast.success("Filament added successfully");
         onClose();
+        dispatch(fetchFilaments(token)); // Re-fetch filaments
       } else {
         toast.error("Error adding filament");
       }

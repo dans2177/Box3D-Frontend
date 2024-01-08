@@ -1,75 +1,50 @@
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import DashboardLogo from "../../assets/DashboardLogo.gif";
-import LoginIcon from "../../assets/LoginIcon.png";
-import SignUpIcon from "../../assets/SignUpIcon.png";
-import { FiArrowRight } from "react-icons/fi"; // Importing right arrow icon
+import DashboardLogo from "../../assets/AuthBanner.png";
+import SmallScreenGif from "../../assets/DashboardLogo.gif";
 
 const AuthenticationForm = () => {
   const { login, register } = useKindeAuth();
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-200 pb-20">
-      {/* Top Bar */}
-      <div className="flex flex-col items-center w-full px-4 py-2   top-0 z-10">
-        <img
-          className="h-16 md:h-24"
-          src={DashboardLogo}
-          alt="3D Logbook Logo"
-        />
-        <h1 className="text-xl md:text-3xl p-2 font-sans">3D Logbook</h1>
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-200">
+      {/* Left Side - Welcome Text, Buttons, and Small Screen GIF */}
+      <div className="flex flex-col w-full min-h-screen lg:w-1/2 justify-center items-center p-10 bg-white">
+        {/* Small Screen GIF */}
+        <div className="lg:hidden h-40 w-40 mb-4">
+          <img
+            src={SmallScreenGif} // Replace with your GIF for small screens
+            alt="3D Logbook Small Screen"
+            className="h-full w-full object-cover rounded-full" // Added rounded-full for a circular shape, remove if not needed
+          />
+        </div>
+
+        <h1 className="text-4xl lg:text-6xl font-bold mb-4 font-orbitron">
+          Welcome to 3D Logbook
+        </h1>
+        <p className="text-xl lg:text-2xl mb-8">
+          Your personal 3D project tracker and inventory manager.
+        </p>
+        <button
+          onClick={login}
+          className="border-4 border-blue-500 text-blue-500 font-bold py-3 px-6 rounded hover:bg-blue-500 hover:text-white transition duration-300 ease-in-out mb-4 text-lg lg:text-xl custom-font"
+        >
+          Login
+        </button>
+        <button
+          onClick={register}
+          className="border-4 border-orange-500 text-orange-500 hover:text-white font-bold py-3 px-6 rounded hover:bg-orange-500 transition duration-300 ease-in-out text-lg lg:text-xl custom-font"
+        >
+          Sign Up
+        </button>
       </div>
 
-      {/* Content */}
-      <div className="flex-grow flex items-center justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-          <div className="bg-gray-800 rounded-lg shadow-md hover:bg-gray-900 cursor-pointer relative">
-            <img
-              src={LoginIcon}
-              alt="Login"
-              className="w-full h-48 md:h-64 object-cover rounded-t-lg"
-            />
-            <div
-              onClick={login}
-              className="p-2 flex justify-between items-center"
-            >
-              {/* Adjust the text coloring to match the icon's color */}
-              <h2
-                className="text-lg md:text-xl font-sans pt-8"
-                style={{ color: "#00B4D8" }}
-              >
-                Login
-              </h2>
-              <FiArrowRight
-                className="text-2xl absolute bottom-0 right-0 mb-2 mr-2"
-                style={{ color: "#00B4D8" }}
-              />
-            </div>
-          </div>
-
-          <div
-            onClick={register}
-            className="bg-gray-800 rounded-lg shadow-md hover:bg-gray-900 cursor-pointer relative"
-          >
-            <img
-              src={SignUpIcon}
-              alt="Start Tracking"
-              className="w-full h-48 md:h-64 object-cover rounded-t-lg"
-            />
-            <div className="p-2 flex justify-between items-center">
-              {/* Adjust the text coloring to match the icon's color */}
-              <h2
-                className="text-lg md:text-xl font-sans pt-8"
-                style={{ color: "#FFA500" }}
-              >
-                Sign Up
-              </h2>
-            </div>
-            <FiArrowRight
-              className="text-2xl absolute bottom-0 right-0 mb-2 mr-2"
-              style={{ color: "#FFA500" }}
-            />
-          </div>
-        </div>
+      {/* Right Side - Large Image for large screens */}
+      <div className="hidden lg:block w-1/2 h-auto  items-center justify-center bg-gray-800">
+        <img
+          src={DashboardLogo} // Replace with your large screen image
+          alt="3D Logbook"
+          className="object-cover h-full w-full"
+        />
       </div>
     </div>
   );

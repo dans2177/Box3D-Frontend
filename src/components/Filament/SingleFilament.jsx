@@ -20,6 +20,8 @@ import Overlay from "../../assets/Overlay.png";
 import CountUp from "react-countup";
 import { GrSubtractCircle } from "react-icons/gr";
 import { MdAutorenew } from "react-icons/md";
+import { FiAlertTriangle, FiXCircle, FiSave } from "react-icons/fi";
+import { Tooltip } from "react-tooltip";
 
 // ----------------------------------------------------------------
 // Logic
@@ -48,7 +50,7 @@ const SingleFilament = () => {
   const [editedColor, setEditedColor] = useState(localFilament.color || "");
   const [urlError, setUrlError] = useState(""); // New state for URL error
 
-  const handleDeleteSubtraction = async (subtractionId) => {
+  const handleDeleteSubtraction = async ( subtractionId) => {
     try {
       const token = await getToken();
       await dispatch(deleteSubtraction({ filamentId, subtractionId, token }));
@@ -81,7 +83,8 @@ const SingleFilament = () => {
     ? (localFilament.currentAmount / localFilament.startingAmount) * 100
     : 0;
 
-  const handleArchive = async () => {
+  const handleArchive = async (e) => {
+    e.preventDefault();
     try {
       const token = await getToken();
       const updateData = {
@@ -131,7 +134,8 @@ const SingleFilament = () => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    e.preventDefault();
     if (urlError) {
       toast.error("Please fix the errors before saving.");
       return;
@@ -199,7 +203,7 @@ const SingleFilament = () => {
           </div>
 
           {/* Filament Details */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+          <div className="flex flex-col md:flex-row space-between items-center mb-4">
             {/* Filament Image, Info, and CountUp */}
             <div className="flex items-center justify-between w-full">
               {/* Filament Image */}
@@ -215,7 +219,7 @@ const SingleFilament = () => {
               </div>
               {/* Filament Info */}
               <div className="ml-4 flex-grow">
-                <h2 className="text-4xl pb-4 font-bold text-gray-800 dark:text-gray-200 truncate">
+                <h2 className="text-2xl md:text-4xl pb-4 font-bold text-gray-800 dark:text-gray-200 truncate">
                   {isEditing ? (
                     <input
                       type="text"
@@ -228,10 +232,10 @@ const SingleFilament = () => {
                     localFilament.name
                   )}
                 </h2>
-                <p className="text-bold text-gray-900 dark:text-gray-300">
+                <p className="text-bold text-sm text-gray-900 dark:text-gray-300">
                   {localFilament.material} {localFilament.size}mm
                 </p>
-                <div className="text-gray-900 dark:text-gray-300">
+                <div className="text-sm text-red-700 dark:text-red-300">
                   {isEditing ? (
                     <input
                       type="number"
@@ -245,7 +249,7 @@ const SingleFilament = () => {
                   )}
                 </div>
 
-                <div className="text-gray-900 dark:text-gray-300 ">
+                <div className="text-sm text-gray-900 dark:text-gray-300 ">
                   {isEditing ? (
                     <div>
                       <label>Link:</label>
@@ -284,32 +288,68 @@ const SingleFilament = () => {
                   )}
                 </div>
               </div>
+
               <div>
-                {/* CountUp for Current Amount */}
-                <CountUp
-                  start={0}
-                  end={Number(localFilament.currentAmount)} // Convert to a number
-                  duration={2} // Set the duration for the CountUp animation (in seconds)
-                  separator=","
-                  className="text-8xl md:text-10xl text-gray-800 dark:text-gray-200 font-extrabold ml-4 font-orbitron tracking-wide"
-                />
-                <span className="mr-0 md:mr-4 text-2xl text-gray-500 ml-1">
-                  g
-                </span>
+                {isEditing ? (
+                  // Show ChromePicker when isEditing is true
+                  <div className="">
+                    <ChromePicker
+                      color={editedColor}
+                      onChangeComplete={handleColorChange}
+                    />
+                  </div>
+                ) : (
+                  // Show CountUp otherwise
+                  <div>
+                    <CountUp
+                      start={0}
+                      end={Number(localFilament.currentAmount)}
+                      duration={2}
+                      separator=","
+                      className="text-auto text-3xl md:text-6xl font-extrabold ml-4 font-orbitron tracking-wide text-gray-900 dark:text-gray-200"
+                    />
+                    <span className="mr-0 md:mr-4 text-2xl text-gray-500 ml-1">
+                      g
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
+
             <div className="w-full gap-4 md:gap-0 md:w-auto md:ml-4 flex flex-row md:flex-col justify-between md:items-start">
-              <button
-                onClick={toggleEdit}
-                className="flex items-center justify-center text-blue-600 hover:text-white dark:text-white py-2 px-4 rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] dark:bg-blue-600 dark:hover:bg-blue-800 border-4 border-blue-600 dark:border-none hover:bg-blue-600"
-              >
-                <FiEdit className="mr-2 text-base" />{" "}
-                {/* Adjust text-base if needed */}
-                {isEditing ? "Cancel" : "Edit"}
-              </button>
+              {/* Edit Button */}
+              {isEditing ? (
+                <div className="flex justify-between w-full">
+                  <button
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content="Cancel"
+                    onClick={toggleEdit}
+                    className="flex items-center justify-center border-4 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-800 text-red-600 hover:text-white dark:text-white rounded h-12 w-5/12  border-red-600 dark:border-none transition duration-150 ease-in-out"
+                  >
+                    <FiXCircle className="text-lg" />
+                  </button>
+                  <button
+                    data-tooltip-id="tooltip"
+                    data-tooltip-content="Save"
+                    onClick={handleSave}
+                    className="flex items-center justify-center border-4 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-800 text-blue-600 hover:text-white dark:text-white rounded h-12 w-5/12  border-blue-600 dark:border-none transition duration-150 ease-in-out"
+                  >
+                    <FiSave className="text-lg" />
+                  </button>
+                  <Tooltip id="tooltip" place="right" effect="solid" />
+                </div>
+              ) : (
+                <button
+                  onClick={toggleEdit}
+                  className="flex items-center justify-center text-blue-600 hover:text-white mt-4 dark:text-white py-2 px-4 rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] dark:bg-blue-600 dark:hover:bg-blue-800 border-4 border-blue-600 dark:border-none hover:bg-blue-600"
+                >
+                  <FiEdit className="mr-2 text-base" /> Edit
+                </button>
+              )}
+              {/* Archive Button */}
               <button
                 onClick={handleArchive}
-                className={`flex items-center justify-center border-4 dark:border-none hover:text-white dark:text-white py-2 px-4 h-12 rounded my-4 md:mb-2 flex-grow md:flex-grow-0 md:min-w-[140px] ${
+                className={`flex items-center justify-center border-4 dark:border-none mt-4 hover:text-white dark:text-white py-2 px-4 h-12 rounded my-4 md:mb-2 flex-grow md:flex-grow-0 md:min-w-[140px] ${
                   isArchived
                     ? "dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-700 border-red-600 text-red-500"
                     : "dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-700 border-green-600 text-green-600"
@@ -319,14 +359,22 @@ const SingleFilament = () => {
                 {/* Adjust text-base if needed */}
                 {isArchived ? "Unarchive" : "Archive"}
               </button>
+              {localFilament.name && localFilament.currentAmount > 0 && (
+                <SubtractionFilament
+                  filamentId={filamentId}
+                  filamentName={localFilament.name}
+                  currentAmount={localFilament.currentAmount}
+                  className="flex items-center justify-center text-red-600 mt-4 md:mt-2 hover:text-white dark:text-white   rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] dark:bg-red-600 dark:hover:bg-red-800 border-4 border-red-600 dark:border-none hover:bg-red-600"
+                />
+              )}
             </div>
           </div>
 
           {/* Remaining Percentage Bar */}
-          <div className="bg-red-400 rounded-full h-6 m-4 mt-8 border-2 border-gray-900">
+          <div className="bg-red-400 rounded-xl h-6 m-4 mt-8 border-2 border-gray-900">
             <div
               style={{ width: `${remainingPercentage}%` }}
-              className="bg-green-500 h-full rounded-full  "
+              className="bg-green-500 h-full rounded-lg"
             ></div>
           </div>
 
@@ -355,60 +403,33 @@ const SingleFilament = () => {
                 </button>
               )}
               <br />
-              {isEditing && (
-                <div className="p-4  ">
-                  <label className="block text-lg font-medium dark:text-white mb-2">
-                    Update Color
-                  </label>
-                  <ChromePicker
-                    color={editedColor}
-                    onChangeComplete={handleColorChange}
-                  />
-                </div>
-              )}
 
-              {/* Conditionally rendered Save Button */}
-              {isEditing && (
-                <button
-                  onClick={handleSave}
-                  className="text-orange-600 hover:text-white dark:text-white py-2 px-4 rounded mt-2 md:mt-2 flex-grow dark:border-none md:flex-grow-0 md:min-w-[140px] border-4 border-orange-600 dark:bg-orange-600 hover:bg-orange-600 hover:dark:bg-orange-900"
-                >
-                  Save Changes
-                </button>
-              )}
-              {/* Conditionally render the "Delete" button */}
+              {/* Style the message and conditionally render the "Delete" button */}
               {isArchived && (
-                <button
-                  onClick={handleDeleteFilament}
-                  className="text-white py-2 mt-10 px-4 rounded flex items-center justify-center min-w-[140px] max-w-[140px] bg-red-500 hover:bg-red-600"
-                >
-                  <FiTrash className="mr-2" />{" "}
-                  {/* Icon with margin-right for spacing */}
-                  Delete
-                </button>
-              )}
-              {/* Style the message */}
-              {isArchived && (
-                <p className="dark:text-gray-300 mt-2">
-                  Do not delete!
-                  <br /> Keep archived instead, else tracking data will be lost
-                  :(
-                </p>
+                <div className="fixed bottom-0 left-0 right-0 bg-red-600 text-white p-4 flex items-center justify-around">
+                  <div className="flex items-center">
+                    <FiAlertTriangle className="text-2xl mr-2" />
+                    <p>
+                      Do not delete!
+                      <br />
+                      Keep archived instead, else tracking data will be lost :(
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleDeleteFilament}
+                    className="text-white py-2 px-4 rounded flex items-center justify-center min-w-[140px] max-w-[140px] bg-red-500 hover:bg-red-600"
+                  >
+                    <FiTrash className="mr-2" /> Delete
+                  </button>
+                </div>
               )}
             </div>
 
             <div className="order-1 md:order-2">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-bold text-gray-200 mt-4 mb-2">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-4 mb-2">
                   Subtractions
                 </h3>
-                {localFilament.name && localFilament.currentAmount && (
-                  <SubtractionFilament
-                    filamentId={filamentId}
-                    filamentName={localFilament.name}
-                    currentAmount={localFilament.currentAmount}
-                  />
-                )}
               </div>
               {localFilament.subtractions &&
                 localFilament.subtractions.map(
@@ -429,6 +450,8 @@ const SingleFilament = () => {
                           {new Date(subtraction.date).toLocaleDateString()}
                         </div>
                         <button
+                          data-tooltip-id="tooltip"
+                          data-tooltip-content="Delete"
                           onClick={() =>
                             handleDeleteSubtraction(subtraction._id)
                           }
@@ -436,6 +459,7 @@ const SingleFilament = () => {
                         >
                           <FiTrash />
                         </button>
+                        <Tooltip id="tooltip" place="right" effect="solid" />
                       </div>
                     </div>
                   )

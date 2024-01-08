@@ -14,7 +14,6 @@ export const fetchFilaments = createAsyncThunk(
   }
 );
 
-
 // Update User Filament
 export const updateFilament = createAsyncThunk(
   "filament/updateFilament",
@@ -219,7 +218,6 @@ const filamentSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchFilaments.fulfilled, (state, action) => {
-        console.log("fetchFilaments payload:", action.payload); // Debug log
         state.status = "succeeded";
         state.items = action.payload.data;
       })
@@ -232,7 +230,8 @@ const filamentSlice = createSlice({
       })
       .addCase(addFilament.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items.push(action.payload);
+        state.items?.push(action.payload);
+        console.log(action.payload);
       })
       .addCase(addFilament.rejected, (state, action) => {
         state.error = action.error.message;
@@ -249,10 +248,9 @@ const filamentSlice = createSlice({
           (f) => f._id === updatedFilament._id
         );
         if (filamentIndex !== -1) {
-          // Directly assign the updatedFilament to the state
           state.items[filamentIndex] = updatedFilament;
-
-          // Recalculate currentAmount based on subtractions
+          state.items[filamentIndex].subtractions =
+            state.items[filamentIndex].subtractions || [];
           const totalSubtractedLength = updatedFilament.subtractions.reduce(
             (total, subtraction) => total + subtraction.subtractionLength,
             0
@@ -266,23 +264,19 @@ const filamentSlice = createSlice({
         const existingFilamentIndex = state.items.findIndex(
           (f) => f._id === updatedFilament._id
         );
-
         if (existingFilamentIndex !== -1) {
-          // Replace the existing filament in the state
           state.items[existingFilamentIndex] = updatedFilament;
         } else {
-          // Filament doesn't exist in the state, push it
           state.items.push(updatedFilament);
         }
       })
       .addCase(createSubtraction.fulfilled, (state, action) => {
         const { filamentId, newSubtraction } = action.payload;
         const index = state.items.findIndex((f) => f._id === filamentId);
-
         if (index !== -1) {
+          state.items[index].subtractions =
+            state.items[index].subtractions || [];
           state.items[index].subtractions.push(newSubtraction);
-
-          // Recalculate the currentAmount
           const totalSubtractedLength = state.items[index].subtractions.reduce(
             (total, subtraction) => total + subtraction.subtractionLength,
             0
@@ -308,8 +302,6 @@ const filamentSlice = createSlice({
           state.items[filamentIndex].subtractions = state.items[
             filamentIndex
           ].subtractions.filter((s) => s._id !== subtractionId);
-
-          // Recalculate the currentAmount after the subtraction delete
           const totalSubtractedLength = state.items[
             filamentIndex
           ].subtractions.reduce(

@@ -122,7 +122,7 @@ const InventoryView = () => {
           <>
             <button
               onClick={() => setShowFilamentForm(true)}
-              data-tooltip-id="add-button-tooltip"
+              data-tooltip-id="tooltip"
               data-tooltip-content="Add Item"
               className="border-4 border-green-600  dark:text-white dark:border-none text-green-600 hover:text-white dark:bg-green-500 darkLtext-white hover:bg-green-600 rounded-full p-2 inline-flex items-center justify-center transition duration-200"
             >
@@ -130,7 +130,7 @@ const InventoryView = () => {
             </button>
             <Tooltip id="add-button-tooltip" place="right" effect="solid" />
             <button
-              data-tooltip-id="archive-tooltip"
+              data-tooltip-id="tooltip"
               data-tooltip-content={
                 showArchived ? "Hide Archived" : "Show Archived"
               }
@@ -142,7 +142,7 @@ const InventoryView = () => {
               <IoIosArchive className=" dark:text-white" size={28} />
             </button>
             <button
-              data-tooltip-id="settings-tooltip"
+              data-tooltip-id="tooltip"
               data-tooltip-content="Settings"
               className="text-blue-700 hover:bg-blue-600 dark:text-white hover:text-white border-4 border-blue-600 dark:border-none dark:bg-blue-600 dark:hover:bg-blue-700 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
             >
@@ -150,8 +150,7 @@ const InventoryView = () => {
             </button>
 
             {/* Tooltip components */}
-            <Tooltip id="archive-tooltip" place="right" effect="solid" />
-            <Tooltip id="settings-tooltip" place="right" effect="solid" />
+            <Tooltip id="tooltip" place="right" effect="solid" />
           </>
         )}
         {showFilamentForm && (

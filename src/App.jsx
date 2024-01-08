@@ -8,9 +8,11 @@ import FilamentForm from "./components/Filament/FilamentForm.jsx";
 import SingleFilament from "./components/Filament/SingleFilament.jsx";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const darkMode = useSelector((state) => state.theme.darkMode);
+  const toastContainerTheme = darkMode ? "dark" : "light";
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -36,6 +38,18 @@ function App() {
         <Route path="/filaments/add" element={<FilamentForm />} />
         <Route path="/filament/:filamentId" element={<SingleFilament />} />
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover
+        theme={toastContainerTheme}
+      />
     </Router>
   );
 }

@@ -11,7 +11,7 @@ import { IoMdCheckmarkCircle, IoMdCloseCircle } from "react-icons/io";
 
 ReactModal.setAppElement("#root");
 
-const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
+const SubtractionFilament = ({ filamentId, filamentName, currentAmount, className }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [subtractionAmount, setSubtractionAmount] = useState("");
   const dispatch = useDispatch();
@@ -57,7 +57,7 @@ const SubtractionFilament = ({ filamentId, filamentName, currentAmount }) => {
     <>
       <button
         onClick={openModal}
-        className="text-red-800 border-2 border-red-700 hover:bg-red-800 dark:border-none hover:text-white dark:bg-red-500 dark:hover:bg-red-700 dark:text-white font-bold py-1 px-3 rounded w-1/2 flex items-center justify-center"
+        className={`${className}`}
       >
         <GrSubtractCircle className="text-2xl mr-1" />
         <span className="text-xs">Quick Subtract</span>
@@ -107,6 +107,7 @@ SubtractionFilament.propTypes = {
   filamentId: PropTypes.string.isRequired,
   filamentName: PropTypes.string.isRequired,
   currentAmount: PropTypes.number.isRequired,
+  className: PropTypes.string, 
 };
 
 export default SubtractionFilament;
