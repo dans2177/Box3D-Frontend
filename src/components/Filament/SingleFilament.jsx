@@ -50,7 +50,7 @@ const SingleFilament = () => {
   const [editedColor, setEditedColor] = useState(localFilament.color || "");
   const [urlError, setUrlError] = useState(""); // New state for URL error
 
-  const handleDeleteSubtraction = async ( subtractionId) => {
+  const handleDeleteSubtraction = async (subtractionId) => {
     try {
       const token = await getToken();
       await dispatch(deleteSubtraction({ filamentId, subtractionId, token }));
@@ -187,7 +187,7 @@ const SingleFilament = () => {
     <div className="bg-gray-300 dark:bg-gray-700 min-h-screen">
       <div className="bg-gray-200 p-4 mx-auto max-w-4xl dark:bg-gray-800 min-h-screen">
         <div className="mb-4">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex items-start mb-4">
             <div
               className="inline-flex justify-center items-center rounded-full transition-all p-1 hover:bg-green-900"
               onClick={handleBackClick}
@@ -198,14 +198,12 @@ const SingleFilament = () => {
                 className="text-gray-900 dark:text-gray-100"
               />
             </div>
-            <h1 className="text-2xl font-bold text-center"></h1>
-            <div></div>
           </div>
 
           {/* Filament Details */}
-          <div className="flex flex-col md:flex-row space-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start md:items-center mb-4">
             {/* Filament Image, Info, and CountUp */}
-            <div className="flex items-center justify-between w-full">
+            <div className="flex justify-start items-start my-4">
               {/* Filament Image */}
               <div
                 className="relative w-32 h-32 md:w-38 md:h-38 rounded-full ml-2 animate-spin hover:animate-spin-fast"
@@ -218,12 +216,13 @@ const SingleFilament = () => {
                 />
               </div>
               {/* Filament Info */}
-              <div className="ml-4 flex-grow">
-                <h2 className="text-2xl md:text-4xl pb-4 font-bold text-gray-800 dark:text-gray-200 truncate">
+
+              <div className="flex flex-col ml-4 ">
+                <h2 className="text-4xl pb-4 font-bold text-gray-800 dark:text-gray-200 truncate">
                   {isEditing ? (
                     <input
                       type="text"
-                      name="name" // Important: This should match the handleInputChange logic
+                      name="name"
                       value={editedName}
                       onChange={handleInputChange}
                       className="dark:text-white dark:bg-gray-800 border-gray-600 border-2 p-2 h-10 w-40 rounded"
@@ -242,14 +241,13 @@ const SingleFilament = () => {
                       name="temp"
                       value={editedTemp}
                       onChange={(e) => setEditedTemp(e.target.value)}
-                      className="dark:text-white dark:bg-gray-800 border-gray-600 border-2 p-2  h-6 w-20 rounded"
+                      className="dark:text-white dark:bg-gray-800 border-gray-600 border-2 p-2 h-6 w-20 rounded"
                     />
                   ) : (
                     <p>{editedTemp}°</p>
                   )}
                 </div>
-
-                <div className="text-sm text-gray-900 dark:text-gray-300 ">
+                <div className="text-sm text-gray-900 dark:text-gray-300">
                   {isEditing ? (
                     <div>
                       <label>Link:</label>
@@ -288,43 +286,41 @@ const SingleFilament = () => {
                   )}
                 </div>
               </div>
-
-              <div>
-                {isEditing ? (
-                  // Show ChromePicker when isEditing is true
-                  <div className="">
-                    <ChromePicker
-                      color={editedColor}
-                      onChangeComplete={handleColorChange}
-                    />
-                  </div>
-                ) : (
-                  // Show CountUp otherwise
-                  <div>
-                    <CountUp
-                      start={0}
-                      end={Number(localFilament.currentAmount)}
-                      duration={2}
-                      separator=","
-                      className="text-auto text-3xl md:text-6xl font-extrabold ml-4 font-orbitron tracking-wide text-gray-900 dark:text-gray-200"
-                    />
-                    <span className="mr-0 md:mr-4 text-2xl text-gray-500 ml-1">
-                      g
-                    </span>
-                  </div>
-                )}
-              </div>
+            </div>
+            {/* CountUp Component */}
+            <div className="mt-6 w-full flex justify-center items-center sm:w-auto">
+              {isEditing ? (
+                <div className="flex justify-center w-full sm:w-auto">
+                  <ChromePicker
+                    color={editedColor}
+                    onChangeComplete={handleColorChange}
+                  />
+                </div>
+              ) : (
+                <div className="text-center sm:text-left font-orbitron">
+                  <CountUp
+                    start={0}
+                    end={Number(localFilament.currentAmount)}
+                    duration={2}
+                    separator=","
+                    className="text-auto text-8xl font-extrabold  tracking-wide text-gray-900 dark:text-gray-200"
+                  />
+                  <span className="text-lg text-gray-800 dark:text-gray-500 self-end mb-1 ml-1">
+                    g
+                  </span>
+                </div>
+              )}
             </div>
 
-            <div className="w-full gap-4 md:gap-0 md:w-auto md:ml-4 flex flex-row md:flex-col justify-between md:items-start">
+            <div className="w-full sm:w-auto mt-4 md:mr-4 sm:mt-0 flex flex-row sm:flex-col justify-between sm:items-start">
               {/* Edit Button */}
               {isEditing ? (
-                <div className="flex justify-between w-full">
+                <div className="flex mx-2 justify-between items-center  w-1/2 sm:w-full">
                   <button
                     data-tooltip-id="tooltip"
                     data-tooltip-content="Cancel"
                     onClick={toggleEdit}
-                    className="flex items-center justify-center border-4 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-800 text-red-600 hover:text-white dark:text-white rounded h-12 w-5/12  border-red-600 dark:border-none transition duration-150 ease-in-out"
+                    className="flex items-center justify-center border-4 w-1/2  dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-800 text-red-600 hover:text-white dark:text-white rounded h-12  sm:w-5/12 border-red-600 dark:border-none transition duration-150 ease-in-out mx-1"
                   >
                     <FiXCircle className="text-lg" />
                   </button>
@@ -332,7 +328,7 @@ const SingleFilament = () => {
                     data-tooltip-id="tooltip"
                     data-tooltip-content="Save"
                     onClick={handleSave}
-                    className="flex items-center justify-center border-4 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-800 text-blue-600 hover:text-white dark:text-white rounded h-12 w-5/12  border-blue-600 dark:border-none transition duration-150 ease-in-out"
+                    className="flex items-center justify-center border-4 w-1/2 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-800 text-blue-600 hover:text-white dark:text-white rounded h-12 sm:w-5/12 border-blue-600 dark:border-none transition duration-150 ease-in-out mx-1"
                   >
                     <FiSave className="text-lg" />
                   </button>
@@ -341,7 +337,7 @@ const SingleFilament = () => {
               ) : (
                 <button
                   onClick={toggleEdit}
-                  className="flex items-center justify-center text-blue-600 hover:text-white mt-4 dark:text-white py-2 px-4 rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] dark:bg-blue-600 dark:hover:bg-blue-800 border-4 border-blue-600 dark:border-none hover:bg-blue-600"
+                  className="flex items-center justify-center text-blue-600 hover:text-white mt-4 mx-2 dark:text-white py-2 px-4 rounded h-12 my-4 sm:mb-0 flex-grow md:flex-grow-0 sm:min-w-full dark:bg-blue-600 dark:hover:bg-blue-800 border-4 border-blue-600 dark:border-none hover:bg-blue-600 "
                 >
                   <FiEdit className="mr-2 text-base" /> Edit
                 </button>
@@ -349,7 +345,7 @@ const SingleFilament = () => {
               {/* Archive Button */}
               <button
                 onClick={handleArchive}
-                className={`flex items-center justify-center border-4 dark:border-none mt-4 hover:text-white dark:text-white py-2 px-4 h-12 rounded my-4 md:mb-2 flex-grow md:flex-grow-0 md:min-w-[140px] ${
+                className={`flex items-center justify-center border-4 dark:border-none mt-4 mx-2 hover:text-white dark:text-white py-2 px-4 h-12 rounded my-4 sm:mb-2 flex-grow md:flex-grow-0 sm:w-full ${
                   isArchived
                     ? "dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-700 border-red-600 text-red-500"
                     : "dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-700 border-green-600 text-green-600"
@@ -364,7 +360,7 @@ const SingleFilament = () => {
                   filamentId={filamentId}
                   filamentName={localFilament.name}
                   currentAmount={localFilament.currentAmount}
-                  className="flex items-center justify-center text-red-600 mt-4 md:mt-2 hover:text-white dark:text-white   rounded h-12 my-4 md:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] dark:bg-red-600 dark:hover:bg-red-800 border-4 border-red-600 dark:border-none hover:bg-red-600"
+                  className="flex items-center justify-center text-red-600 mt-4 sm:mt-2 hover:text-white dark:text-white w-1/4 sm:w-full md:w-f  mx-2 rounded h-12 sm:my-4 sm:mb-0 flex-grow md:flex-grow-0 md:min-w-[140px] dark:bg-red-600 dark:hover:bg-red-800 border-4 border-red-600 dark:border-none hover:bg-red-600"
                 />
               )}
             </div>
@@ -379,7 +375,7 @@ const SingleFilament = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="order-2 md:order-1">
+            <div className="order-2 md:order-1 mb-10">
               <h3 className="text-xl font-bold mt-4 mb-2 text-gray-800 dark:text-gray-200">
                 Notes
               </h3>
@@ -387,7 +383,7 @@ const SingleFilament = () => {
                 name="notes"
                 value={editedNote}
                 onChange={handleInputChange}
-                className="w-full h-32 p-2 border rounded mt-2 text-gray-900 dark:bg-slate-800 dark:text-gray-200"
+                className="w-full h-32 p-2 border rounded mt-2  text-gray-900 dark:bg-slate-800 dark:text-gray-200"
               />
               {/* Update Notes Button */}
               {noteEdited && (
