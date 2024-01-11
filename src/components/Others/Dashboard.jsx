@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
+import DashboardLogoDark from "../../assets/DashboardDark.gif";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const Dashboard = () => {
       navigate("/projects");
     }
   };
+  const logoSrc = darkMode ? DashboardLogoDark : DashboardLogo;
 
   const handleToggle = () => {
     dispatch(toggleDarkMode());
@@ -33,11 +35,7 @@ const Dashboard = () => {
     <div className="flex flex-col min-h-screen bg-gray-200 dark:bg-gray-700 pb-20">
       {/* Top Bar */}
       <div className="flex flex-col items-center w-full px-4 py-2 pt-4">
-        <img
-          className="h-16 md:h-24"
-          src={DashboardLogo}
-          alt="3D Logbook Logo"
-        />
+        <img className="h-16 md:h-24" src={logoSrc} alt="3D Logbook Logo" />
         <h1 className="text-xl font-orbitron text-gray-800 dark:text-gray-200 md:text-3xl p-2">
           3D Logbook
         </h1>
@@ -58,7 +56,7 @@ const Dashboard = () => {
             />
             <div className="p-2 flex justify-between items-center">
               <h2 className="text-lg font-bold font-orbitron text-green-700 dark:text-gray-200 md:text-xl tracking-widest pt-8">
-                FILAMENTS
+                FILAMENT 
               </h2>
             </div>
             {/* Positioned arrow icon at the bottom right */}
@@ -74,12 +72,12 @@ const Dashboard = () => {
             />
             {/* Overlay */}
             <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-80 flex items-center justify-center rounded-lg">
-              <span className="text-white tracking-widest text-xl">Coming Soon</span>
+              <span className="text-white tracking-widest text-xl">
+                Coming Soon
+              </span>
             </div>
 
-            <div
-              className="p-2 flex justify-between items-center"
-            >
+            <div className="p-2 flex justify-between items-center">
               <h2 className="text-lg font-bold font-orbitron text-blue-700 dark:text-gray-200 md:text-xl tracking-widest pt-8">
                 PROJECTS
               </h2>

@@ -24,12 +24,12 @@ function App() {
     }
   }, [darkMode]);
 
-  const { isAuthenticated, isLoading, getToken } = useKindeAuth();
+  const { isAuthenticated, isLoading } = useKindeAuth();
 
   if (isLoading) return <LoadingComponent />;
 
   if (!isAuthenticated) return <AuthenticationForm />;
-  if (isAuthenticated) console.log(getToken());
+  
   return (
     <Router>
       <Routes>
