@@ -46,24 +46,6 @@ const Dashboard = () => {
       {/* Content */}
       <div className="flex-grow flex items-center justify-center ">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-          {/* Projects Tile */}
-          <div className="bg-violet-100 dark:bg-blue-700 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative">
-            <img
-              src={projectsImage}
-              alt="Projects"
-              className="w-full h-48 md:h-64 object-cover rounded-t-lg"
-            />
-            <div
-              onClick={() => handleTileClick("projects")}
-              className="p-2 flex justify-between items-center"
-            >
-              <h2 className="text-lg font-bold font-orbitron text-blue-700 dark:text-gray-200 md:text-xl tracking-widest pt-8">
-                PROJECTS
-              </h2>
-              <FiArrowRight className="text-2xl text-blue-700 dark:text-gray-200 absolute bottom-0 right-0 mb-2 mr-2" />
-            </div>
-          </div>
-
           {/* Filaments Tile */}
           <div
             onClick={() => handleTileClick("filament")}
@@ -81,6 +63,28 @@ const Dashboard = () => {
             </div>
             {/* Positioned arrow icon at the bottom right */}
             <FiArrowRight className="text-2xl text-green-600 dark:text-gray-200 absolute bottom-0 right-0 mb-2 mr-2" />
+          </div>
+
+          {/* Projects Tile */}
+          <div className="bg-violet-100 dark:bg-blue-700 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative">
+            <img
+              src={projectsImage}
+              alt="Projects"
+              className="w-full h-48 md:h-64 object-cover rounded-t-lg"
+            />
+            {/* Overlay */}
+            <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-80 flex items-center justify-center rounded-lg">
+              <span className="text-white tracking-widest text-xl">Coming Soon</span>
+            </div>
+
+            <div
+              className="p-2 flex justify-between items-center"
+            >
+              <h2 className="text-lg font-bold font-orbitron text-blue-700 dark:text-gray-200 md:text-xl tracking-widest pt-8">
+                PROJECTS
+              </h2>
+              <FiArrowRight className="text-2xl text-blue-700 dark:text-gray-200 absolute bottom-0 right-0 mb-2 mr-2" />
+            </div>
           </div>
         </div>
       </div>
