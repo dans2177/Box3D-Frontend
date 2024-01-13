@@ -5,11 +5,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchFilaments = createAsyncThunk(
   "filament/fetchFilaments",
   async (token) => {
-    const response = await fetch(`http://localhost:3000/filament-data`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `https://box3d-backend-a34f2da5c228.herokuapp.com/filament-data`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.json();
   }
 );
@@ -20,7 +23,7 @@ export const updateFilament = createAsyncThunk(
   async ({ filamentData, token }) => {
     // Add { dispatch }
     const response = await fetch(
-      `http://localhost:3000/filament-data/${filamentData._id}`,
+      `https://box3d-backend-a34f2da5c228.herokuapp.com/filament-data/${filamentData._id}`,
       {
         method: "PUT",
         headers: {
@@ -46,14 +49,17 @@ export const addFilament = createAsyncThunk(
   "filament/addFilament",
   async ({ filamentData, token }) => {
     try {
-      const response = await fetch("http://localhost:3000/filament-data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(filamentData),
-      });
+      const response = await fetch(
+        "https://box3d-backend-a34f2da5c228.herokuapp.com/filament-data",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(filamentData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Error adding filament");
@@ -77,7 +83,7 @@ export const deleteFilament = createAsyncThunk(
   "filament/deleteFilament",
   async ({ filamentId, token }) => {
     const response = await fetch(
-      `http://localhost:3000/filament-data/${filamentId}`,
+      `https://box3d-backend-a34f2da5c228.herokuapp.com/filament-data/${filamentId}`,
       {
         method: "DELETE",
         headers: {
@@ -105,7 +111,7 @@ export const getSingleFilament = createAsyncThunk(
     // Fetch the specific filament by ID if not in state
     try {
       const response = await fetch(
-        `http://localhost:3000/filaments/${filamentId}`,
+        `https://box3d-backend-a34f2da5c228.herokuapp.com/filaments/${filamentId}`,
         {
           method: "GET",
           headers: {
@@ -140,7 +146,7 @@ export const createSubtraction = createAsyncThunk(
     };
 
     const response = await fetch(
-      `http://localhost:3000/filament-data/${filamentId}/subtraction`,
+      `https://box3d-backend-a34f2da5c228.herokuapp.com/filament-data/${filamentId}/subtraction`,
       {
         method: "POST",
         headers: {
@@ -165,7 +171,7 @@ export const getSubtractions = createAsyncThunk(
   "filament/getSubtractions",
   async ({ filamentId, token }) => {
     const response = await fetch(
-      `http://localhost:3000/filament-data/${filamentId}/subtraction`,
+      `https://box3d-backend-a34f2da5c228.herokuapp.com/filament-data/${filamentId}/subtraction`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -181,7 +187,7 @@ export const deleteSubtraction = createAsyncThunk(
   "filament/deleteSubtraction",
   async ({ filamentId, subtractionId, token }, { dispatch }) => {
     const response = await fetch(
-      `http://localhost:3000/filament-data/${filamentId}/subtraction/${subtractionId}`,
+      `https://box3d-backend-a34f2da5c228.herokuapp.com/filament-data/${filamentId}/subtraction/${subtractionId}`,
       {
         method: "DELETE",
         headers: {
