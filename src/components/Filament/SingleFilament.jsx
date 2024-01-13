@@ -57,7 +57,6 @@ const SingleFilament = () => {
       toast.success("Subtraction deleted successfully!");
     } catch (error) {
       toast.error("Error deleting subtraction.");
-      console.error("Error deleting subtraction:", error);
     }
   };
 
@@ -74,7 +73,6 @@ const SingleFilament = () => {
         navigate(-1);
       } catch (error) {
         toast.error("Error deleting filament.");
-        console.error("Error deleting filament:", error);
       }
     }
   };
@@ -101,7 +99,6 @@ const SingleFilament = () => {
       );
     } catch (error) {
       toast.error("Error in archiving.");
-      console.error("Error archiving:", error);
     }
   };
   const handleColorChange = (color) => {

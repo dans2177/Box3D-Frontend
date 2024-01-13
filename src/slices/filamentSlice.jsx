@@ -54,14 +54,12 @@ export const addFilament = createAsyncThunk(
         },
         body: JSON.stringify(filamentData),
       });
-      console.log(response);
 
       if (!response.ok) {
         throw new Error("Error adding filament");
       }
 
       const responseData = await response.json();
-      console.log(responseData); // Debug log
 
       if (responseData.filament && responseData.filament._id) {
         return responseData.filament;
@@ -69,8 +67,7 @@ export const addFilament = createAsyncThunk(
         throw new Error("Invalid response from the backend");
       }
     } catch (error) {
-      console.error("Error adding filament:", error);
-      throw error; // Re-throw the error to handle it in your component
+      return error.message;
     }
   }
 );
@@ -231,7 +228,6 @@ const filamentSlice = createSlice({
       .addCase(addFilament.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.items?.push(action.payload);
-        console.log(action.payload);
       })
       .addCase(addFilament.rejected, (state, action) => {
         state.error = action.error.message;

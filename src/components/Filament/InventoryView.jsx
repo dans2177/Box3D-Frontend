@@ -6,7 +6,6 @@ import FilamentCard from "./FilamentCard";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import {
   IoIosArchive,
-  IoIosSettings,
   IoIosArrowDown,
   IoIosArrowUp,
   IoIosArrowBack,
@@ -16,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../Others/Loading";
 import { Tooltip } from "react-tooltip";
 import FilamentForm from "./FilamentForm.jsx";
+import { toast } from "react-toastify";
 
 // Selector using reselect for memoization
 const selectFilamentItems = createSelector(
@@ -41,7 +41,7 @@ const InventoryView = () => {
         const token = await getToken();
         await dispatch(fetchFilaments(token));
       } catch (error) {
-        console.error("Error fetching token:", error);
+        toast.error("Error fetching");
       }
     };
 
@@ -141,13 +141,7 @@ const InventoryView = () => {
             >
               <IoIosArchive className=" dark:text-white" size={28} />
             </button>
-            <button
-              data-tooltip-id="tooltip"
-              data-tooltip-content="Settings"
-              className="text-blue-700 hover:bg-blue-600 dark:text-white hover:text-white border-4 border-blue-600 dark:border-none dark:bg-blue-600 dark:hover:bg-blue-700 rounded-full p-2 inline-flex items-center justify-center transition duration-200 w-full"
-            >
-              <IoIosSettings size={28} />
-            </button>
+          
 
             {/* Tooltip components */}
             <Tooltip id="tooltip" place="right" effect="solid" />

@@ -111,7 +111,6 @@ const FilamentForm = ({ isOpen, onClose }) => {
         toast.error("Error adding filament");
       }
     } catch (error) {
-      console.error("Error adding filament:", error);
       toast.error("Error adding filament");
     }
   };
