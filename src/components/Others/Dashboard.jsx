@@ -42,21 +42,23 @@ const Dashboard = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-grow flex items-center justify-center ">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+      <div className="flex-grow flex items-center justify-center">
+        <div className="grid grid-cols-1 max-w-lg md:grid-cols-2 gap-4 mx-auto px-2 sm:px-4">
           {/* Filaments Tile */}
           <div
             onClick={() => handleTileClick("filament")}
-            className="bg-lime-100 dark:bg-lime-800 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative"
+            className="w-60 bg-lime-100 dark:bg-lime-800 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative mx-2 sm:mx-1"
           >
-            <img
-              src={filamentsImage}
-              alt="Filaments"
-              className="w-full h-48 md:h-64 object-cover rounded-t-lg"
-            />
+            <div className="aspect-w-1 aspect-h-1">
+              <img
+                src={filamentsImage}
+                alt="Filaments"
+                className="object-cover rounded-t-lg"
+              />
+            </div>
             <div className="p-2 flex justify-between items-center">
               <h2 className="text-lg font-bold font-orbitron text-green-700 dark:text-gray-200 md:text-xl tracking-widest pt-8">
-                FILAMENT 
+                FILAMENT
               </h2>
             </div>
             {/* Positioned arrow icon at the bottom right */}
@@ -64,12 +66,14 @@ const Dashboard = () => {
           </div>
 
           {/* Projects Tile */}
-          <div className="bg-violet-100 dark:bg-blue-700 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative">
-            <img
-              src={projectsImage}
-              alt="Projects"
-              className="w-full h-48 md:h-64 object-cover rounded-t-lg"
-            />
+          <div className="w-60 bg-violet-100 dark:bg-blue-700 rounded-lg shadow-md hover:bg-gray-900 dark:hover:bg-gray-900 cursor-pointer relative mx-2 sm:mx-1">
+            <div className="aspect-w-1 aspect-h-1">
+              <img
+                src={projectsImage}
+                alt="Projects"
+                className="object-cover rounded-t-lg"
+              />
+            </div>
             {/* Overlay */}
             <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-80 flex items-center justify-center rounded-lg">
               <span className="text-white tracking-widest text-xl">
