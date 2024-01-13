@@ -21,8 +21,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     redirectUri="https://www.3dlogbook.com/"
     audience="https://thebox3d.com"
     onRedirectCallback={onRedirectCallback}
-    //DO NOT USE BELOW IN PRODUCTION SET CUSTOM DOMAIN!!!!
-    isDangerouslyUseLocalStorage={true}
   >
     <Provider store={store}>
       <App />
