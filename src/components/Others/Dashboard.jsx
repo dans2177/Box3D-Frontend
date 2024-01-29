@@ -107,7 +107,7 @@ const Dashboard = () => {
             window.open("https://makerworld.com/en/models/151555", "_blank")
           }
         >
-          <IoCloudDownloadOutline />
+          <IoCloudDownloadOutline size={28} />
         </button>
 
         <button
